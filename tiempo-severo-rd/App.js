@@ -8,15 +8,20 @@ import { NavigationContainer } from '@react-navigation/native';
 // React Components
 import React, { useState, useEffect} from 'react';
 import { firebase } from './config';
+import Icon from '@expo/vector-icons/FontAwesome';
 
 // Screens and Pages
 import { Dashboard } from './screens';
 import { Settings, Profile} from './screens'
 import { Login, SignUp, Welcome} from "./screens";
+import { PuertoRico, DominicanRepublican, Notifications, UpgradePlan} from './screens';
+import Sidebar from './components/Sidebar';
 
+// Navigation Containers
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
+// App Layout 
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
@@ -68,9 +73,86 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Drawer.Navigator useLegacyImplementation={true} initialRouteName="Dashboard">
-        <Drawer.Screen name="Dashboard" component={Dashboard} />
-        <Drawer.Screen name="Settings" component={Settings} />
+      <Drawer.Navigator
+        useLegacyImplementation={true} 
+        initialRouteName="Dashboard"
+        drawerContent={(props) => <Sidebar {...props}/>}
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Drawer.Screen 
+          name="Home" 
+          component={Dashboard} 
+          options={{
+            title: 'Home',
+            drawerIcon: ({focused, color, size})=> (
+              <Icon name="home" size={18} color={color} />
+            ),
+          }}
+
+        />
+        <Drawer.Screen 
+          name="Profile" 
+          component={Profile} 
+          options={{
+            title: 'Profile',
+            drawerIcon: ({focused, color, size})=> (
+              <Icon name="user" size={18} color={color} />
+            ),
+          }}  
+        />
+        <Drawer.Screen 
+          name="Puerto Rico" 
+          component={PuertoRico} 
+          options={{
+            title: 'Puerto Rico',
+            drawerIcon: ({focused, color, size})=> (
+              <Icon name="globe" size={18} color={color} />
+            ),
+          }}  
+        />
+        <Drawer.Screen 
+          name="Dominican Republic" 
+          component={DominicanRepublican} 
+          options={{
+            title: 'Dominican Republic',
+            drawerIcon: ({focused, color, size})=> (
+              <Icon name="globe" size={18} color={color} />
+            ),
+          }}  
+        />
+        <Drawer.Screen 
+          name="Notification" 
+          component={Notifications} 
+          options={{
+            title: 'Notifications',
+            drawerIcon: ({focused, color, size})=> (
+              <Icon name="bell-o" size={18} color={color} />
+            ),
+          }}  
+        />
+        <Drawer.Screen 
+          name="Settings" 
+          component={Settings} 
+          options={{
+            title: 'Settings',
+            drawerIcon: ({focused, color, size})=> (
+              <Icon name="cog" size={18} color={color} />
+            ),
+          }}  
+        />
+        <Drawer.Screen 
+          name="Upgrade your plan" 
+          component={UpgradePlan} 
+          options={{
+            title: 'Upgrade your plan',
+            drawerIcon: ({focused, color, size})=> (
+              <Icon name="suitcase" size={18} color={color} />
+            ),
+          }}  
+        />
+        
       </Drawer.Navigator>
     </NavigationContainer>
   );

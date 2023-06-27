@@ -4,6 +4,10 @@ import Profile from "./Profile";
 import Login from "./Login";
 import SignUp from "./SignUp";
 import Welcome from "./Welcome";
+import PuertoRico from "./PuertoRico";
+import DominicanRepublican from "./DominicanRepublican";
+import Notifications from "./Notifications";
+import UpgradePlan from "./UpgradePlan";
 
 export{
     Dashboard,
@@ -11,5 +15,9 @@ export{
     Profile,
     Login, 
     SignUp,
-    Welcome
+    Welcome,
+    PuertoRico,
+    DominicanRepublican,
+    Notifications,
+    UpgradePlan
 }
