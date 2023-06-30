@@ -1,18 +1,12 @@
 import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ImageBackground, StatusBar} from 'react-native'
 import React from 'react'
-import { useAuth } from "../hooks/useAuth";
 import Icon from "@expo/vector-icons/FontAwesome";
 import SubscriptionPlan from "../components/SubscriptionPlan";
 
 var {Platform} = React;
 
-// TODO : make user types - Admin and normal user
-// TODO : only admin can change the data
-
 // function Dashboard ({ navigation} ){
 const Dashboard = ({ navigation} ) => {
-  const { user } = useAuth();
-  const username = (user?.displayName === ' ') ? 'user' : user?.displayName;
   return (
     <>
       <SafeAreaView style={{flex:0, backgroundColor: '#4967a4'}}/>
@@ -37,8 +31,8 @@ const Dashboard = ({ navigation} ) => {
             </TouchableOpacity>
         </View>
 
-        <View style={{backgroundColor: '#4967a4', height: 150, borderBottomRightRadius: 15, borderBottomLeftRadius: 15, justifyContent: 'center', alignItems: 'center'}}>
-          <Text style={{fontSize: 35, fontWeight: 600, color: '#fff', top: -30}}>Subscription Plan</Text>
+        <View style={styles.container}>
+          <Text style={styles.header}>Subscription Plan</Text>
         </View>
 
         <ScrollView style={{top: -50}}>
@@ -49,6 +43,7 @@ const Dashboard = ({ navigation} ) => {
             benifit2="Limited Content"
             benifit3="Free access"
             enable={true}
+            image={require("../images/Welcome_BG.jpg")}
           />
 
           <SubscriptionPlan 
@@ -58,6 +53,7 @@ const Dashboard = ({ navigation} ) => {
             benifit2=" "
             benifit3=" "
             enable={false}
+            image={require("../images/profileBackground.jpg")}
           />
 
           <SubscriptionPlan 
@@ -67,6 +63,7 @@ const Dashboard = ({ navigation} ) => {
             benifit2=" "
             benifit3=" "
             enable={false}
+            image={require("../images/profileBackground.jpg")}
           />
 
           <SubscriptionPlan 
@@ -76,6 +73,7 @@ const Dashboard = ({ navigation} ) => {
             benifit2=" "
             benifit3=" "
             enable={false}
+            image={require("../images/Welcome_BG.jpg")}
           />
         </ScrollView>
 
@@ -85,17 +83,24 @@ const Dashboard = ({ navigation} ) => {
 }
 
 const styles = StyleSheet.create({
+    container: {
+      backgroundColor: '#4967a4', 
+      height: 150, 
+      borderBottomRightRadius: 15, 
+      borderBottomLeftRadius: 15, 
+      justifyContent: 'center', 
+      alignItems: 'center'
+    },
+    header: {
+      fontSize: 35, 
+      fontWeight: 600, 
+      color: '#fff', 
+      top: -30
+    },
     userInfo: {
         flexDirection: 'row', 
         justifyContent: 'space-between',
         backgroundColor: '#4967a4'
-    },
-    userName: {
-        justifyContent: 'center',
-        fontSize: (Platform.OS === 'ios') ? 25 : 20, 
-        paddingHorizontal: 10, 
-        paddingTop: 10,
-        textAlign: 'center'
     },
     profileImage: {
         borderWidth: 2,
@@ -104,37 +109,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop : (Platform.OS === 'ios') ? 0 : 5,
     },
-    latestNews: {
-        marginTop: 10,
-        flexDirection: 'row',
-        height: 200,
-        alignItems: 'center',
-        borderTopWidth: 2,
-        borderBottomWidth: 2,
-        paddingTop: 20,
-        paddingBottom: 20,
-    },
-    latestNewsText: {
-        flex: 1,
-        padding: 20,
-    },
-    latestNewsImage: {
-        flex: 1,
-        height: '100%',
-        resizeMode: 'cover'
-    },
-    mapsViewContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        height: '100%',
-        padding: 5,
-    },
-    planUpgradeContainer: {
-        height: 100,
-        alignItems: 'center',
-        padding: 10
-    }
 });
 
 export default Dashboard;

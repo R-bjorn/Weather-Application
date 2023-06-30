@@ -132,17 +132,6 @@ export default function App() {
             ),
           }}  
         /> */}
-        
-        {/* <Drawer.Screen 
-          name="Settings" 
-          component={Settings} 
-          options={{
-            title: 'Settings',
-            drawerIcon: ({focused, color, size})=> (
-              <Icon name="cog" size={18} color={color} />
-            ),
-          }}  
-        /> */}
         <Drawer.Screen 
           name="Upgrade your plan" 
           component={UpgradePlan} 
