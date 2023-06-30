@@ -1,10 +1,12 @@
-import { View, Text, Image, ImageBackground, Pressable, TextInput, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, Image, 
+    ImageBackground, Pressable, 
+    TextInput, TouchableOpacity, 
+    ScrollView } 
+    from 'react-native';
+import React, { useState } from 'react';
 import COLORS from '../constants/colors';
 import { Ionicons } from "@expo/vector-icons";
-import Checkbox from "expo-checkbox"
-import Button from '../components/Button';
+import Checkbox from "expo-checkbox";
 import {firebase} from '../config'
 
 const SignUp = ({ navigation }) => {
@@ -18,39 +20,24 @@ const SignUp = ({ navigation }) => {
 
     const registerUser = async(email, password, username) => {
         await firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(() => {
-            firebase.auth().currentUser.sendEmailVerification({
-                handleCodeInApp: true,
-                url: 'tiempo-severo-rd-99be7.firebaseapp.com',
-            })
-            .then(() => {
-                alert('Verification email sent!')
-            }).catch((error) => { 
-                alert(error.message)
-            })
-            .then(() => {
-                firebase.firestore().collection('users')
-                .doc(firebase.auth().currentUser.uid)
-                .set({
-                    username, 
-                    email, 
+        .then((userCredentials) => {
+            if(userCredentials.user){
+                userCredentials.user.updateProfile({
+                  displayName: username
                 })
+            }
+        })
+        .catch((error) => {alert(error.message)})
+        .then(() => {
+            firebase.firestore().collection('users')
+            .doc(firebase.auth().currentUser.uid)
+            .set({
+                username, 
+                email, 
             })
-            .catch((error) => {alert(error.message)})
         })
         .catch((error) => {alert(error.message)})
     }
-    // const handleSignup = () => {
-    //     auth
-    //         .createUserWithEmailAndPassword(email, password)
-    //         .then(userCredentials => {
-    //             const user = userCredentials.user;
-    //             console.log(user.email);
-    //         })
-    //         .catch(error => {
-    //             alert(error.message)
-    //         })
-    // }
 
     return (
         <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -66,11 +53,12 @@ const SignUp = ({ navigation }) => {
             ></ImageBackground >
             {/* Register form */}
             <View style={{ flex: 1, marginHorizontal: 22 ,
-               backgroundColor: COLORS.transparentWhite, top: '20%', padding: 20, maxHeight: 1020 }}>
-              {/* Register Title */}
-                <View style={{  }}>
+               backgroundColor: COLORS.transparentWhite, top: '10%', padding: 20, maxHeight: (Platform.OS === 'ios') ? 640 : "100%"
+            }}>
+                {/* Register Title */}
+                <View>
                     <Text style={{
-                        fontSize: 45,
+                        fontSize: (Platform.OS === 'ios') ? 45 : 35,
                         fontWeight: 700,
                         marginTop: 10,
                         letterSpacing: 2,
@@ -81,7 +69,8 @@ const SignUp = ({ navigation }) => {
                         Create Account
                     </Text>
                 </View>
-
+                
+                {/* Input Fields */}
                 <ScrollView>
                     {/* Username */}
                     <View style={{ marginBottom: 12 }}>
@@ -144,49 +133,6 @@ const SignUp = ({ navigation }) => {
                             />
                         </View>
                         </View>
-                    {/* Phone Number */}
-                    {/* <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>Mobile Number</Text>
-
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            paddingLeft: 22
-                        }}>
-                            <TextInput
-                                placeholder='+1'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='numeric'
-                                value={phone}
-                                onChangeText={text => setPhone(text)}
-                                style={{
-                                    width: "12%",
-                                    borderRightWidth: 1,
-                                    borderLeftColor: COLORS.grey,
-                                    height: "100%"
-                                }}
-                            />
-
-                            <TextInput
-                                placeholder='Enter your phone number'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='numeric'
-                                style={{
-                                    width: "80%"
-                                }}
-                            />
-                        </View>
-                    </View> */}
                     {/* Password */}
                     <View style={{ marginBottom: 12 }}>
                         <Text style={{
@@ -235,7 +181,8 @@ const SignUp = ({ navigation }) => {
                             </TouchableOpacity>
                         </View>
                     </View>
-                        {/* Agreement of term and conditions */}
+                    
+                    {/* Agreement of term and conditions */}
                     <View style={{
                         flexDirection: 'row',
                         marginVertical: 6
@@ -247,43 +194,41 @@ const SignUp = ({ navigation }) => {
                             color={isChecked ? COLORS.primary : undefined}
                         />
 
-                        <Text>I aggree to the terms and conditions</Text>
+                        <Text>I agree to the </Text>
+                        {/* TODO: Add terms and condition pdf */}
+                        <Pressable onPress={ () => {}}>
+                            <Text style={{
+                                textDecorationLine: 'underline', fontWeight: "bold",
+                            }}>terms and conditions</Text>
+                        </Pressable>
                     </View>
-                    {/* SignUp Button */}
-                    {/* <Button
-                        title="Sign Up"
-                        onPress={}
-                        filled
-                        style={{
-                            marginTop: 18,
-                            marginBottom: 4,
-                        }}
-                    /> */}
 
-                <TouchableOpacity
-                        onPress={() => registerUser(email, password, username)}
-                    style={{
-                        marginTop: 10,
-                        paddingBottom: 16,
-                        paddingVertical: 10,
-                        borderColor: COLORS.primary,
-                        borderWidth: 2,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'rgba(0,0,0, 0.9)'
-                    }}
-                    >
-                    <Text
-                        style={{fontSize: 23, color: COLORS.white, fontWeight: 'bold', letterSpacing: 3}}
-                    >Sign Up</Text>
-                </TouchableOpacity>
+                    {/* Sign Up Button */}
+                    <TouchableOpacity
+                            onPress={() => registerUser(email, password, username)}
+                        style={{
+                            marginTop: 10,
+                            paddingBottom: 16,
+                            paddingVertical: 10,
+                            borderColor: COLORS.primary,
+                            borderWidth: 2,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(0,0,0, 0.9)'
+                        }}
+                        >
+                        <Text
+                            style={{fontSize: (Platform.OS === 'ios') ? 23 : 20, color: COLORS.white, fontWeight: 'bold', letterSpacing: 3}}
+                        >Sign Up</Text>
+                    </TouchableOpacity>
+
                     {/* Or Sign up with */}
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
                         <View
                             style={{
                                 flex: 1,
                                 height: 1,
-                                backgroundColor: COLORS.grey,
+                                backgroundColor: COLORS.black,
                                 marginHorizontal: 10
                             }}
                         />
@@ -292,7 +237,7 @@ const SignUp = ({ navigation }) => {
                             style={{
                                 flex: 1,
                                 height: 1,
-                                backgroundColor: COLORS.grey,
+                                backgroundColor: COLORS.black,
                                 marginHorizontal: 10
                             }}
                         />
@@ -303,6 +248,7 @@ const SignUp = ({ navigation }) => {
                         flexDirection: 'row',
                         justifyContent: 'center'
                     }}>
+                        {/* Facebook API */}
                         <TouchableOpacity
                             onPress={() => console.log("Pressed")}
                             style={{
@@ -318,17 +264,18 @@ const SignUp = ({ navigation }) => {
                             }}
                             >
                             <Image
-                            source={{uri: 'https://1000logos.net/wp-content/uploads/2016/11/Facebook-logo.png'}}
-                            style={{
-                                height: 66,
-                                width: 66,
-                                marginRight: 8
-                            }}
-                            resizeMode='contain'
+                                source={{uri: 'https://1000logos.net/wp-content/uploads/2016/11/Facebook-logo.png'}}
+                                style={{
+                                    height: 66,
+                                    width: 66,
+                                    marginRight: 8
+                                }}
+                                resizeMode='contain'
                             />
 
                         </TouchableOpacity>
 
+                        {/* Google API */}
                         <TouchableOpacity
                             onPress={() => console.log("Pressed")}
                             style={{
@@ -342,7 +289,7 @@ const SignUp = ({ navigation }) => {
                                 marginRight: 4,
                                 borderRadius:100
                             }}
-                            >
+                        >
                             <Image
                                 source={{uri: 'https://pluspng.com/img-png/google-logo-png-open-2000.png'}}
                                 style={{
@@ -353,9 +300,10 @@ const SignUp = ({ navigation }) => {
                                 resizeMode='contain'
                             />
 
-                            </TouchableOpacity>
+                        </TouchableOpacity>
 
-                            <TouchableOpacity
+                        {/* Twitter API */}
+                        <TouchableOpacity
                             onPress={() => console.log("Pressed")}
                             style={{
                                 flex: 1,
@@ -368,7 +316,7 @@ const SignUp = ({ navigation }) => {
                                 marginRight: 4,
                                 borderRadius: 50
                             }}
-                            >
+                        >
                             <Image
                             source={{uri: 'https://logos-download.com/wp-content/uploads/2016/02/Twitter_Logo_new.png'}}
                             style={{
@@ -379,11 +327,9 @@ const SignUp = ({ navigation }) => {
                             resizeMode='contain'
                             />
 
-                        </TouchableOpacity>
-                        
-
-                        
+                        </TouchableOpacity> 
                     </View>
+
                     {/* Login Link */}
                     <View style={{
                         flexDirection: "row",

@@ -1,15 +1,28 @@
-import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ImageBackground} from 'react-native'
+import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ImageBackground, StatusBar} from 'react-native'
 import React from 'react'
 import Maps from '../components/Maps';
+import { useAuth } from "../hooks/useAuth";
+
+var {Platform} = React;
+
+// TODO : make user types - Admin and normal user
+// TODO : only admin can change the data
 
 // function Dashboard ({ navigation} ){
 const Dashboard = ({ navigation} ) => {
+    const { user } = useAuth();
+    const username = (user?.displayName === ' ') ? 'user' : user?.displayName;
   return (
     // </LinearGradient>
     <SafeAreaView style={{flex: 1}}>
+        <StatusBar 
+            backgroundColor={(Platform.OS === 'ios') ? "#fff" : "#f1f1f1"}
+            barStyle={'dark-content'}
+            hidden={false} />
         {/* User Information */}
         <View style={styles.userInfo}>
-            <Text style={styles.userName}>Hello, tejedawx</Text>
+            {/* {firebase.auth().currentUser?.email} */}
+            <Text style={styles.userName}>Hello, {username}!</Text>
             <TouchableOpacity style={styles.profileImage} onPress={() => {navigation.openDrawer()}}>
                 <ImageBackground 
                     source={require('../images/profile.jpg')}
@@ -24,10 +37,11 @@ const Dashboard = ({ navigation} ) => {
                 <Text style={{textAlign: 'center',
                             fontWeight: 'bold',
                             fontVariant: 'small-caps',
-                            fontSize: 25}}>
+                            fontSize: (Platform.OS === 'ios') ? 25 : 20
+                            }}>
                     Breaking News
                 </Text>
-                <Text style={{textAlign: 'justify', marginTop: 5}}>
+                <Text style={{textAlign: 'justify', marginTop: 5, fontSize: (Platform.OS === 'ios') ? 15 : 10}}>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
                 </Text>
             </View>
@@ -54,9 +68,10 @@ const Dashboard = ({ navigation} ) => {
             </View>
         </ScrollView>
 
+        {/* TODO : Only free users are to view this */}
         {/* Plan Upgrade Window */}
         <View style={[styles.planUpgradeContainer]}>
-            <TouchableOpacity onPress={() => {}}>
+            <TouchableOpacity onPress={() => {navigation.navigate("UpgradePlan")}}>
                 <Text style={{fontSize: 30, fontWeight: 500, paddingBottom: 10}}>Upgarde your plan</Text>
             </TouchableOpacity>
             <Text>You can view unlimited maps and keep up-to-date with our daily maps and weather updates.</Text>
@@ -68,21 +83,21 @@ const Dashboard = ({ navigation} ) => {
 const styles = StyleSheet.create({
     userInfo: {
         flexDirection: 'row', 
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
     },
     userName: {
         justifyContent: 'center',
-        fontSize: 25, 
+        fontSize: (Platform.OS === 'ios') ? 25 : 20, 
         paddingHorizontal: 10, 
-        paddingTop: 15,
+        paddingTop: 10,
         textAlign: 'center'
     },
     profileImage: {
         borderWidth: 2,
         borderRadius: 100,
-        height: "100%",
-        width: 40,
         marginHorizontal: 10,
+        alignSelf: 'center',
+        marginTop : (Platform.OS === 'ios') ? 0 : 5,
     },
     latestNews: {
         marginTop: 10,

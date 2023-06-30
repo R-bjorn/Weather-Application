@@ -122,7 +122,7 @@ export default function App() {
             ),
           }}  
         />
-        <Drawer.Screen 
+        {/* <Drawer.Screen 
           name="Notification" 
           component={Notifications} 
           options={{
@@ -131,8 +131,9 @@ export default function App() {
               <Icon name="bell-o" size={18} color={color} />
             ),
           }}  
-        />
-        <Drawer.Screen 
+        /> */}
+        
+        {/* <Drawer.Screen 
           name="Settings" 
           component={Settings} 
           options={{
@@ -141,7 +142,7 @@ export default function App() {
               <Icon name="cog" size={18} color={color} />
             ),
           }}  
-        />
+        /> */}
         <Drawer.Screen 
           name="Upgrade your plan" 
           component={UpgradePlan} 

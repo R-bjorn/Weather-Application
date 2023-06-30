@@ -5,17 +5,20 @@ import {
     Image,
     Text,
     ImageBackground,
-    TouchableOpacity
+    TouchableOpacity,
+    Platform
 } from 'react-native';
 import {
     DrawerContentScrollView,
     DrawerItemList
 } from '@react-navigation/drawer';
 import Icon from "@expo/vector-icons/FontAwesome";
-import { ScrollView } from 'react-native-gesture-handler';
+import { firebase } from "../config";
+import { useAuth } from "../hooks/useAuth";
 
 const Sidebar = (props) => {
-
+    const { user } = useAuth();
+    const username = (user?.displayName === '') ? 'user' : user?.displayName;
     return (
         <View style={{flex: 1}}>
             <DrawerContentScrollView {...props}>
@@ -27,7 +30,7 @@ const Sidebar = (props) => {
                         source={require("../images/profile.jpg")}
                         style={styles.profile}
                     />
-                    <Text style={styles.profileName}>tejedawx</Text>
+                    <Text style={styles.profileName}>{username}</Text>
                 </ImageBackground>
 
                 <View style={styles.container}>
@@ -35,7 +38,13 @@ const Sidebar = (props) => {
                 </View>
             </DrawerContentScrollView>
             <View style={{padding: 20, borderTopWidth: 1, borderTopColor: '#ccc'}}>
-                <TouchableOpacity onPress={() => {}} style={{paddingVertical: 15}}>
+                <TouchableOpacity onPress={() => {
+                    firebase.auth().signOut().then(function() {
+                        // Sign-out successful.
+                      }).catch(function(error) {
+                        // An error happened.
+                      })
+                }} style={{paddingVertical: (Platform.OS === 'ios') ? 15 : 0}}>
                     <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                         <Icon name='sign-out' size={18}/>
                         <Text style={{fontSize: 18, paddingHorizontal: 10}}>Signout</Text>
@@ -64,7 +73,7 @@ const styles = StyleSheet.create({
         // marginBottom: 5
     },
     profileName:{
-        fontSize: 30,
+        fontSize: (Platform.OS === 'ios') ? 30 : 25,
         color: "#fff",
         fontWeight: "800",
         marginVertical: 8

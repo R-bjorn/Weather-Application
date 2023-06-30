@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native'
 import React from 'react'
+
 
 const Maps = () => {
   return (
@@ -34,7 +35,9 @@ const Maps = () => {
   )
 }
 
-const styles = StyleSheet.create({
+const windowWidth = Dimensions.get('window').width;
+
+const styles = StyleSheet.create({    
     container: {
         height: 350,
         backgroundColor: '#e8f9ee',
@@ -50,7 +53,7 @@ const styles = StyleSheet.create({
     },
     mapImage: {
         height: '100%',
-        width: 358,
+        width: windowWidth - 32,
         resizeMode: 'cover'
     },
     mapDescription: {
