@@ -1,7 +1,7 @@
 import { View, Text, Image, 
     ImageBackground, Pressable, 
     TextInput, TouchableOpacity, 
-    ScrollView } 
+    ScrollView, Linking } 
     from 'react-native';
 import React, { useState } from 'react';
 import COLORS from '../constants/colors';
@@ -12,6 +12,8 @@ import {firebase} from '../config'
 const SignUp = ({ navigation }) => {
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    // ROLE = {0 - Admin, 1 - Premium User, 2 - Puerto Rico User, 3 - Dominican Republican User, 4 - Free User}
+    const role = 4; 
 
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
@@ -34,6 +36,7 @@ const SignUp = ({ navigation }) => {
             .set({
                 username, 
                 email, 
+                role
             })
         })
         .catch((error) => {alert(error.message)})
@@ -196,7 +199,7 @@ const SignUp = ({ navigation }) => {
 
                         <Text>I agree to the </Text>
                         {/* TODO: Add terms and condition pdf */}
-                        <Pressable onPress={ () => {}}>
+                        <Pressable onPress={() => Linking.openURL('https://google.com')}>
                             <Text style={{
                                 textDecorationLine: 'underline', fontWeight: "bold",
                             }}>terms and conditions</Text>

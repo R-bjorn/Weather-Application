@@ -1,7 +1,31 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
 import React from 'react'
+import { useAuth } from "../hooks/useAuth";
+import { firebase } from "../config";
 
 const SubscriptionPlan = (props) => {
+
+  const { user } = useAuth();
+
+  const changeUserRole = (newRole) => {
+    // Get a reference to the 'users' collection
+    const usersCollectionRef = firebase.firestore().collection('users');
+
+    console.log(user?.uid);
+    // Query the collection and retrieve the roles of each user
+    usersCollectionRef
+    .doc(user?.uid)
+    .update({ role: newRole })
+    .then(() => {
+      console.log('Role updated successfully!');
+    })
+    .catch((error) => {
+      console.log('Error updating role:', error);
+    });
+
+    props.navigation.navigate("Login");
+  }
+
   return (
     // Button that takes them to individual payment methods
     <View style={styles.container}>
@@ -27,6 +51,7 @@ const SubscriptionPlan = (props) => {
           <View>
             <TouchableOpacity
               style={[styles.purchaseBtn, {backgroundColor: (props.enable) ? "#aab5ff" : '#fff'}]}
+              onPress={() => {changeUserRole(props.userRole)}}
             >
               <Text style={{ 
                 color: (props.enable) ? "#fff": "#000",  

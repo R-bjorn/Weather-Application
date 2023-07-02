@@ -1,12 +1,32 @@
-import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ImageBackground, StatusBar} from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ImageBackground, StatusBar} from 'react-native'
 import React from 'react'
 import Icon from "@expo/vector-icons/FontAwesome";
 import SubscriptionPlan from "../components/SubscriptionPlan";
+
+import {useEffect, useState} from "react";
+import { useAuth } from "../hooks/useAuth";
+import { firebase } from "../config";
 
 var {Platform} = React;
 
 // function Dashboard ({ navigation} ){
 const Dashboard = ({ navigation} ) => {
+  const { user } = useAuth();
+  const [role, setRole] = useState('');
+
+  // Get a reference to the 'users' collection
+  const usersCollectionRef = firebase.firestore().collection('users');
+
+  // Query the collection and retrieve the roles of each user
+  usersCollectionRef
+  .doc(user?.uid)
+  .get()
+  .then((doc) => {
+    setRole(doc.data().role);
+  })
+  .catch((error) => {
+      console.log('Error getting users:', error);
+  });
   return (
     <>
       <SafeAreaView style={{flex:0, backgroundColor: '#4967a4'}}/>
@@ -31,10 +51,12 @@ const Dashboard = ({ navigation} ) => {
             </TouchableOpacity>
         </View>
 
+        {/* Subscription Plan Heading */}
         <View style={styles.container}>
           <Text style={styles.header}>Subscription Plan</Text>
         </View>
 
+        {/* All plans */}
         <ScrollView style={{top: -50}}>
           <SubscriptionPlan 
             user="Free User" 
@@ -42,28 +64,34 @@ const Dashboard = ({ navigation} ) => {
             benifit1="Limited Maps"
             benifit2="Limited Content"
             benifit3="Free access"
-            enable={true}
-            image={require("../images/Welcome_BG.jpg")}
+            enable={(role === 4) ? true : false}
+            image={require("../images/free_user.jpeg")}
+            userRole = {4}
+            navigation = {navigation}
           />
 
           <SubscriptionPlan 
             user="Puerto Rico" 
             price={4.99}
-            benifit1=" "
-            benifit2=" "
-            benifit3=" "
-            enable={false}
-            image={require("../images/profileBackground.jpg")}
+            benifit1="Rain and Thunder Maps"
+            benifit2="Hazardous Storm Risk"
+            benifit3="Wind Gust Risk"
+            enable={(role === 2) ? true : false}
+            image={require("../images/Puerto_rico.jpg")}
+            userRole = {2}
+            navigation = {navigation}
           />
 
           <SubscriptionPlan 
             user="Dominican Republican" 
             price={4.99}
-            benifit1=" "
-            benifit2=" "
-            benifit3=" "
-            enable={false}
-            image={require("../images/profileBackground.jpg")}
+            benifit1="Rain and Thunder Maps"
+            benifit2="Hazardous Storm Risk"
+            benifit3="Wind Gust Risk"
+            enable={(role === 3) ? true : false}
+            image={require("../images/Dominican_republican.png")}
+            userRole = {3}
+            navigation = {navigation}
           />
 
           <SubscriptionPlan 
@@ -72,8 +100,10 @@ const Dashboard = ({ navigation} ) => {
             benifit1=" "
             benifit2=" "
             benifit3=" "
-            enable={false}
-            image={require("../images/Welcome_BG.jpg")}
+            enable={(role === 1) ? true : false}
+            image={require("../images/premium_user.jpg")}
+            userRole = {1}
+            navigation = {navigation}
           />
         </ScrollView>
 

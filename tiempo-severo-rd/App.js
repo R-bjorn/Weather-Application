@@ -9,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import React, { useState, useEffect} from 'react';
 import { firebase } from './config';
 import Icon from '@expo/vector-icons/FontAwesome';
+import { useAuth } from "./hooks/useAuth";
 
 // Screens and Pages
 import { Dashboard } from './screens';

@@ -1,17 +1,41 @@
-import { View, Text, Image, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ImageBackground, StatusBar} from 'react-native'
-import React from 'react'
+// Import react components
+import { 
+    View, Text, Image, 
+    StyleSheet, SafeAreaView, 
+    ScrollView, TouchableOpacity, 
+    ImageBackground, StatusBar
+} from 'react-native'
+import React, {useState}from 'react'
+
+// Import other components
 import Maps from '../components/Maps';
 import { useAuth } from "../hooks/useAuth";
+import { firebase } from "../config";
 
 var {Platform} = React;
 
-// TODO : make user types - Admin and normal user
 // TODO : only admin can change the data
 
 // function Dashboard ({ navigation} ){
 const Dashboard = ({ navigation} ) => {
     const { user } = useAuth();
     const username = (user?.displayName === ' ') ? 'user' : user?.displayName;
+    const [role, setRole] = useState('');
+
+    // Get a reference to the 'users' collection
+    const usersCollectionRef = firebase.firestore().collection('users');
+
+    // Query the collection and retrieve the roles of each user
+    usersCollectionRef
+    .doc(user?.uid)
+    .get()
+    .then((doc) => {
+        setRole(doc.data().role);
+    })
+    .catch((error) => {
+        console.log('Error getting users:', error);
+    });
+
   return (
     // </LinearGradient>
     <SafeAreaView style={{flex: 1}}>
@@ -68,14 +92,15 @@ const Dashboard = ({ navigation} ) => {
             </View>
         </ScrollView>
 
-        {/* TODO : Only free users are to view this */}
         {/* Plan Upgrade Window */}
-        <View style={[styles.planUpgradeContainer]}>
+        {(role === 4) 
+        ?<View style={[styles.planUpgradeContainer]}>
             <TouchableOpacity onPress={() => {navigation.navigate("UpgradePlan")}}>
                 <Text style={{fontSize: 30, fontWeight: 500, paddingBottom: 10}}>Upgarde your plan</Text>
             </TouchableOpacity>
             <Text>You can view unlimited maps and keep up-to-date with our daily maps and weather updates.</Text>
-        </View>
+        </View>        
+        : null}
     </SafeAreaView>
   )
 }

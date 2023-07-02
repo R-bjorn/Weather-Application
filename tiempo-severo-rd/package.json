@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-community/blur": "^4.3.2",
     "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/native-stack": "^6.9.13",
     "@types/react": "~18.0.27",
