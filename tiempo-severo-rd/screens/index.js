@@ -8,6 +8,8 @@ import PuertoRico from "./PuertoRico";
 import DominicanRepublican from "./DominicanRepublican";
 import Notifications from "./Notifications";
 import UpgradePlan from "./UpgradePlan";
+import AddPost from "./AddPost";
+import AddNews from "./AddNews";
 
 export{
     Dashboard,
@@ -19,5 +21,7 @@ export{
     PuertoRico,
     DominicanRepublican,
     Notifications,
-    UpgradePlan
+    UpgradePlan,
+    AddPost,
+    AddNews
 }

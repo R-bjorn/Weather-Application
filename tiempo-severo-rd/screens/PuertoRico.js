@@ -65,7 +65,24 @@ const Dashboard = ({ navigation} ) => {
             
         </View>
 
-        { (role === 2 || role === 1) 
+        {/* Admin content to upload posts and breaking news */}
+        {(role === 0)
+        ? <View style={styles.addPostContainer}>
+            <TouchableOpacity style={styles.postButton}>
+                <Icon name="plus" size={20}/>
+                <Text style={{fontSize: 20, fontWeight: 600}}>Add post</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.postButton}>
+                <Icon name="plus" size={20}/>
+                <Text style={{fontSize: 20, fontWeight: 600}}>Add News</Text>
+            </TouchableOpacity>
+        </View>
+
+        : null
+        }
+
+        { (role === 2 || role === 1 || role === 0) 
         ?
         // Content for Dominican Republican users
         <View style={{flex:1, }}>
@@ -183,6 +200,26 @@ const styles = StyleSheet.create({
         height: 100,
         alignItems: 'center',
         padding: 10
+    },
+    addPostContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        backgroundColor: '#1340a5',
+        paddingHorizontal: 20,
+        paddingVertical: 25
+    },
+    postButton: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        width: '40%',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        paddingVertical: 15,
+        shadowColor: 'black', 
+        shadowOffset: { height: 10, width: 5}, 
+        shadowOpacity: 0.5, 
+        shadowRadius: 3, 
     }
 });
 

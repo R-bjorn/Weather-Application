@@ -6,18 +6,23 @@ import {
     ImageBackground, StatusBar
 } from 'react-native'
 import React, {useState}from 'react'
+import { useNavigation } from '@react-navigation/native';
 
 // Import other components
 import Maps from '../components/Maps';
 import { useAuth } from "../hooks/useAuth";
 import { firebase } from "../config";
+import Icon from "@expo/vector-icons/FontAwesome"
 
 var {Platform} = React;
 
 // TODO : only admin can change the data
 
 // function Dashboard ({ navigation} ){
-const Dashboard = ({ navigation} ) => {
+const Dashboard = ({ navigation}) => {
+
+    navigation = useNavigation();
+
     const { user } = useAuth();
     const username = (user?.displayName === ' ') ? 'user' : user?.displayName;
     const [role, setRole] = useState('');
@@ -26,15 +31,9 @@ const Dashboard = ({ navigation} ) => {
     const usersCollectionRef = firebase.firestore().collection('users');
 
     // Query the collection and retrieve the roles of each user
-    usersCollectionRef
-    .doc(user?.uid)
-    .get()
-    .then((doc) => {
-        setRole(doc.data().role);
-    })
-    .catch((error) => {
-        console.log('Error getting users:', error);
-    });
+    usersCollectionRef.doc(user?.uid).get()
+    .then((doc) => { setRole(doc.data().role); })
+    .catch((error) => {console.log('Error getting users:', error);});
 
   return (
     // </LinearGradient>
@@ -55,6 +54,30 @@ const Dashboard = ({ navigation} ) => {
                 />
             </TouchableOpacity>
         </View>
+
+        {/* Admin content to upload posts and breaking news */}
+        {(role === 0)
+        ? <View style={styles.addPostContainer}>
+            <TouchableOpacity 
+                style={styles.postButton}
+                onPress={() => {navigation.navigate("AddPost")}}
+            >
+                <Icon name="plus" size={20}/>
+                <Text style={{fontSize: 20, fontWeight: 600}}>Add post</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+                style={styles.postButton}
+                onPress={() => {navigation.navigate("AddNews")}}
+            >
+                <Icon name="plus" size={20}/>
+                <Text style={{fontSize: 20, fontWeight: 600}}>Add News</Text>
+            </TouchableOpacity>
+        </View>
+
+        : null
+        }
+
         {/* Latest News Content */}
         <View style={[styles.latestNews]}>
             <View style={[styles.latestNewsText]}>
@@ -154,6 +177,26 @@ const styles = StyleSheet.create({
         height: 100,
         alignItems: 'center',
         padding: 10
+    },
+    addPostContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        backgroundColor: '#1340a5',
+        paddingHorizontal: 20,
+        paddingVertical: 25
+    },
+    postButton: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        width: '40%',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        paddingVertical: 15,
+        shadowColor: 'black', 
+        shadowOffset: { height: 10, width: 5}, 
+        shadowOpacity: 0.5, 
+        shadowRadius: 3, 
     }
 });
 
