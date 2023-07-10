@@ -6,8 +6,10 @@ import {
 import React, {useState} from 'react'
 import Icon from "@expo/vector-icons/FontAwesome"
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { useNavigation } from '@react-navigation/native';
 
-const AddNews = () => {
+const AddNews = ({navigation}) => {
+    navigation = useNavigation();
 
     const [desc, setDesc] = useState('')
     const [selectedImage, setSelectedImage] = useState('')
@@ -33,7 +35,9 @@ const AddNews = () => {
             <View style={styles.container}>
                 {/* Title */}
                 <View style={styles.title}>
-                    <Icon name="chevron-left" size={30}/>
+                    <TouchableOpacity onPress={() => {navigation.goBack()}}>
+                        <Icon name="chevron-left" size={30}/>
+                    </TouchableOpacity>
                     <Text style={styles.header}>Add a News</Text>            
                 </View>
     

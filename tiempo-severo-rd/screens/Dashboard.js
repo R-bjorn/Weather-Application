@@ -3,25 +3,37 @@ import {
     View, Text, Image, 
     StyleSheet, SafeAreaView, 
     ScrollView, TouchableOpacity, 
-    ImageBackground, StatusBar
+    ImageBackground, StatusBar,
+    RefreshControl 
 } from 'react-native'
-import React, {useState}from 'react'
+import React, {useState, useEffect}from 'react'
 import { useNavigation } from '@react-navigation/native';
+
+// Firebase
+import { useAuth } from "../hooks/useAuth";
+import { firebase } from "../config";
+// import { fetchMapsData } from "../components/FetchMapData";
+import { collection, query, getDocs } from 'firebase/firestore';
+// import { firebase } from '../config';
 
 // Import other components
 import Maps from '../components/Maps';
-import { useAuth } from "../hooks/useAuth";
-import { firebase } from "../config";
 import Icon from "@expo/vector-icons/FontAwesome"
 
 var {Platform} = React;
 
-// TODO : only admin can change the data
-
-// function Dashboard ({ navigation} ){
 const Dashboard = ({ navigation}) => {
 
     navigation = useNavigation();
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchMaps()
+          .finally(() => {
+            setRefreshing(false);
+          });
+      };
 
     const { user } = useAuth();
     const username = (user?.displayName === ' ') ? 'user' : user?.displayName;
@@ -33,9 +45,42 @@ const Dashboard = ({ navigation}) => {
     // Query the collection and retrieve the roles of each user
     usersCollectionRef.doc(user?.uid).get()
     .then((doc) => { setRole(doc.data().role); })
-    .catch((error) => {console.log('Error getting users:', error);});
+    .catch((error) => { console.log('Error getting users:', error); });
 
-  return (
+    const [mapsData, setMapsData] = useState([]);
+
+    const fetchMapsData = async (userRole) => {
+        const mapsCollectionRef = collection(firebase.firestore(), 'maps');
+        
+        let mapsQuery = query(mapsCollectionRef);
+        if (userRole === 4) {
+          // Limit to 5 latest maps for free users
+          mapsQuery = query(mapsCollectionRef, orderBy('createdAt', 'desc'), limit(5));
+        }
+      
+        const querySnapshot = await getDocs(mapsQuery);
+        
+        const mapsData = querySnapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            image: doc.data().MapImage,
+            description: doc.data().Description,
+          };
+        });
+        
+        return mapsData;
+    };
+
+    const fetchMaps = async () => {
+        const data = await fetchMapsData(role);
+        setMapsData(data);
+    };
+
+    useEffect(() => {    
+        fetchMaps();
+      }, [role]);
+
+    return (
     // </LinearGradient>
     <SafeAreaView style={{flex: 1}}>
         <StatusBar 
@@ -99,19 +144,22 @@ const Dashboard = ({ navigation}) => {
         </View>
 
         {/* All Maps Scrolable Content */}
-        <ScrollView style={[styles.mapsViewContainer]}>
-            <View >
-                < Maps />
-
-                < Maps />
-
-                < Maps />
-
-                < Maps />
-
-                < Maps />
-
-                < Maps />
+        <ScrollView style={styles.mapsViewContainer}
+            refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                />
+              }
+        >
+            <View>
+                {mapsData.length > 0 ? (
+                mapsData.map((map) => (
+                    <Maps key={map.id} image={map.image} description={map.description} />
+                ))
+                ) : (
+                <Text>No maps available</Text>
+                )}
             </View>
         </ScrollView>
 

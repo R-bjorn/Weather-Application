@@ -3,26 +3,127 @@ import {
     SafeAreaView, TextInput,
     Image, TouchableOpacity, ScrollView
 } from 'react-native'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import Icon from "@expo/vector-icons/FontAwesome"
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { auth, db, storage } from '../config';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { useNavigation } from '@react-navigation/native';
+import { addDoc, collection } from 'firebase/firestore';
 
-const AddPost = () => {
-    const [desc, setDesc] = useState('')
-    const [selectedImage, setSelectedImage] = useState('')
+const AddPost = ({ navigation}) => {
+    navigation = useNavigation();
+
+    const [mapDesc, setDesc] = useState(null)
+    const [mapImage, setMapImage] = useState(null)
+    const [selectedImage, setSelectedImage] = useState(null)
     
+    // Upload image on firebase storage
+    const uploadImage = async () => {
+        // Convert image into blob image
+        // const blobImage = null;
+        const blobImage = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function() {
+                resolve(xhr.response);
+            };
+            xhr.onerror = function () {
+                reject(new TypeError('Network request failed'));
+            };
+            xhr.responseType = 'blob';
+            xhr.open("GET", selectedImage, true);
+            xhr.send(null);
+        });
 
-    const selectImage = () => {
-        let options = {
-            storageOptions: {
-                path: 'image',
-            },
+        // Set metadata of image
+        // Create the file metadata
+        /** @type {any} */
+        const metadata = {
+            contentType: 'image/jpeg'
         };
 
-        launchImageLibrary(options, response => {
-            setSelectedImage(response.assets[0].uri)
-            console.log(response); 
+        // Upload Image on storage
+        // Upload file and metadata to the object 'images/mountains.jpg'
+        const storageRef = ref(storage, 'Maps/' + Date.now());
+        const uploadTask = uploadBytesResumable(storageRef, blobImage, metadata);
+
+        // // Listen for state changes, errors, and completion of the upload.
+        uploadTask.on('state_changed',
+        (snapshot) => {
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            // console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+            case 'paused':
+                // console.log('Upload is paused');
+                break;
+            case 'running':
+                // console.log('Upload is running');
+                break;
+            }
+        }, 
+        (error) => {
+            // A full list of error codes is available at
+            // https://firebase.google.com/docs/storage/web/handle-errors
+            switch (error.code) {
+            case 'storage/unauthorized':
+                // User doesn't have permission to access the object
+                break;
+            case 'storage/canceled':
+                // User canceled the upload
+                break;
+
+            // ...
+
+            case 'storage/unknown':
+                // Unknown error occurred, inspect error.serverResponse
+                break;
+            }
+        }, 
+        () => {
+            // Upload completed successfully, now we can get the download URL
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                // console.log('File available at', downloadURL);
+                setMapImage(downloadURL);
+            });
+            alert('Successfully uploaded image');   
+        }
+        );
+    }
+
+    // Select image from library
+    const selectImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
         });
+
+        if (!result.canceled) {
+            setSelectedImage(result.assets[0].uri);
+            // uploadImage();
+        }
+    }
+
+    // Uploading map post on firestore
+    const uploadPost = async () => {
+        // console.log("Desc : " + mapDesc);
+        // console.log("Image : " + mapImage);
+        if(mapImage && mapDesc){
+            try {
+                const docRef = await addDoc(collection(db, 'maps'), {
+                    Description: mapDesc,
+                    MapImage: mapImage 
+                });
+                alert("Successfully uploaded post")
+                navigation.goBack();
+            } catch (error) {
+                // console.log('Error uploading post:', error);
+                alert('Error : ' , error);
+            }
+        }
     }
 
     return (
@@ -32,7 +133,9 @@ const AddPost = () => {
         <View style={styles.container}>
             {/* Title */}
             <View style={styles.title}>
-                <Icon name="chevron-left" size={30}/>
+                <TouchableOpacity onPress={() => {navigation.goBack()}}>
+                    <Icon name="chevron-left" size={30}/>
+                </TouchableOpacity>
                 <Text style={styles.header}>Add a post</Text>            
             </View>
 
@@ -62,8 +165,12 @@ const AddPost = () => {
                 </TouchableOpacity>
             </View>
 
+            {/* Upload Btn */}
             <View style={styles.postBtnContainer}>
-                <TouchableOpacity style={styles.postBtn}>
+                <TouchableOpacity style={styles.postImageBtn} onPress={() => {uploadImage()}}>
+                    <Text style={styles.postImageBtnText}>Upload image</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.postBtn} onPress={() => {uploadPost()}}>
                     <Text style={styles.postBtnText}>Upload</Text>
                 </TouchableOpacity>
             </View>
@@ -115,7 +222,22 @@ const styles = StyleSheet.create({
       postBtnContainer : {
         alignSelf: 'center',
       },
+      postImageBtn: {
+        alignSelf: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#2c3e62',
+        marginTop: 5,
+        width: 100,  
+        height: 30,      
+        borderRadius: 50,
+        shadowColor: 'black', 
+        shadowOffset: { height: 10, width: 5}, 
+        shadowOpacity: 0.5, 
+        shadowRadius: 3,
+      },
       postBtn: {
+        alignSelf: 'center',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
@@ -127,6 +249,11 @@ const styles = StyleSheet.create({
         shadowOffset: { height: 10, width: 5}, 
         shadowOpacity: 0.5, 
         shadowRadius: 3,
+      },
+      postImageBtnText: {
+        color: "#fff",
+        fontSize: 15,
+        fontWeight: 700
       },
       postBtnText: {
         color: "#4967a4",

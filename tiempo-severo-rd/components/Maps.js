@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions }
 import React from 'react'
 
 
-const Maps = () => {
+const Maps = ({ image, description }) => {
   return (
     <View style={[styles.container]}>
       {/* <Text>Map </Text> */}
@@ -11,12 +11,12 @@ const Maps = () => {
         <TouchableOpacity>
             <Image 
                 style={[styles.mapImage]}
-                source={require('../images/Welcome_BG.jpg')}
+                source={{ uri: image }}
             />
         </TouchableOpacity>
       </View>
       <View style={[styles.mapDescription]}>
-        <Text>Description</Text>
+        <Text>{description}</Text>
       </View>
       {/* Map Like/Share/Comment Buttons */}
       <View style={[styles.buttonContainer]}>

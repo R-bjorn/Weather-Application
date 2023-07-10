@@ -15,6 +15,9 @@ import { useAuth } from "../hooks/useAuth";
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from "@expo/vector-icons/FontAwesome";
 import { Dropdown } from 'react-native-element-dropdown';
+import * as ImagePicker from 'expo-image-picker';
+import { auth, db, storage } from '../config';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const Profile = ({navigation}) => {
     const { user } = useAuth();
@@ -26,6 +29,97 @@ const Profile = ({navigation}) => {
 
     const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
+
+    const [profileImage, setProfileImage] = useState('')
+    const [selectedImage, setSelectedImage] = useState('')
+    
+    // Upload image on firebase storage
+    const uploadImage = async () => {
+        // Convert image into blob image
+        // const blobImage = null;
+        const blobImage = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function() {
+                resolve(xhr.response);
+            };
+            xhr.onerror = function () {
+                reject(new TypeError('Network request failed'));
+            };
+            xhr.responseType = 'blob';
+            xhr.open("GET", selectedImage, true);
+            xhr.send(null);
+        });
+
+        // Set metadata of image
+        // Create the file metadata
+        /** @type {any} */
+        const metadata = {
+            contentType: 'image/jpeg'
+        };
+
+        // Upload Image on storage
+        // Upload file and metadata to the object 'images/mountains.jpg'
+        const storageRef = ref(storage, 'Profile Pictures/' + user?.uid);
+        const uploadTask = uploadBytesResumable(storageRef, blobImage, metadata);
+
+        // // Listen for state changes, errors, and completion of the upload.
+        uploadTask.on('state_changed',
+        (snapshot) => {
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+            case 'paused':
+                console.log('Upload is paused');
+                break;
+            case 'running':
+                console.log('Upload is running');
+                break;
+            }
+        }, 
+        (error) => {
+            // A full list of error codes is available at
+            // https://firebase.google.com/docs/storage/web/handle-errors
+            switch (error.code) {
+            case 'storage/unauthorized':
+                // User doesn't have permission to access the object
+                break;
+            case 'storage/canceled':
+                // User canceled the upload
+                break;
+
+            // ...
+
+            case 'storage/unknown':
+                // Unknown error occurred, inspect error.serverResponse
+                break;
+            }
+        }, 
+        () => {
+            // Upload completed successfully, now we can get the download URL
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log('File available at', downloadURL);
+            });
+            setProfileImage(downloadURL)
+            alert('Successfully updated profile!');
+        }
+        );
+    }
+
+    // Select image from library
+    const selectImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setSelectedImage(result.assets[0].uri);
+        }
+    }
 
     return(
         <View style={[styles.container]}> 
@@ -59,10 +153,10 @@ const Profile = ({navigation}) => {
                         {/* Profile Image '+' icon */}
                         <TouchableOpacity
                             // TODO : Add function to select photo from galery and add it on user storage firebase
-                            onPress={() => {}}
+                            onPress={() => {selectImage()}}
                         >
                             <Image
-                                source={require("../images/profile.jpg")}
+                                source={(selectedImage) ? {uri: selectedImage} : require("../images/profile.jpg")}
                                 style={styles.profile}
                             />
                             <Icon name='plus-circle' size={30} style={{left: 90, bottom: 33}}/>
@@ -137,7 +231,7 @@ const Profile = ({navigation}) => {
                     <View style={{flex: 1, alignSelf:'center'}}>
                         <TouchableOpacity
                             // TODO: Add all the information to firebase firestore collection of user data
-                            onPress={() => {}}
+                            onPress={() => {uploadImage()}}
                             style={styles.updateBtn}
                         >
                             <Text style={{fontSize: (Platform.OS === 'ios') ? 30 : 22, color: '#fff', fontWeight: 600}}>Update</Text>
