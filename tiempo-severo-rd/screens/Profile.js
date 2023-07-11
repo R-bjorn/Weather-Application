@@ -124,13 +124,12 @@ const Profile = ({navigation}) => {
             // Upload completed successfully, now we can get the download URL
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             // console.log('File available at', downloadURL);
-                console.log("Upload image successfull")
+                // console.log("Upload image successfull")
                 setProfileImage(downloadURL)
+                updateProfileImage();
             });
         }
         );
-
-        updateProfileImage();
         
     }
 
@@ -150,6 +149,7 @@ const Profile = ({navigation}) => {
     }
 
     const updateProfileImage = async () => {
+        // console.log("Update Profile Image");
         if(profileImage){
             try {
                 const usersCollectionRef = collection(db, 'users');
@@ -198,12 +198,11 @@ const Profile = ({navigation}) => {
                     <View style={{top: 110}}>
                         {/* Profile Image '+' icon */}
                         <TouchableOpacity
-                            // TODO : Add function to select photo from galery and add it on user storage firebase
                             onPress={() => {selectImage()}}
                         >
                             <Image
                                 source={
-                                     userImage ? {uri: userImage} : require("../images/profile.jpg")
+                                     userImage ? {uri: userImage} : (selectedImage) ? {uri: selectedImage} : require("../images/profile.jpg")
                                 }
                                 style={styles.profile}
                             />

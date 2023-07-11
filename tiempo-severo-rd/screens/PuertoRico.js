@@ -163,15 +163,17 @@ const Dashboard = ({ navigation} ) => {
         </View>
         : 
         <View style={{flex: 1}}>
-            <ImageBackground
-                source={require("../images/lockedImage.png")}
-                style={{width: '100%', height: 2.6 * windowHeight/3, marginTop: 10}}
-                blurRadius={10}
-            >
-                <View style={{flex: 1, height: '100%', justifyContent: 'center', alignItems: 'center'}}>
-                    <Icon name='lock' size={80}/>
-                </View>
-            </ImageBackground>            
+            <TouchableOpacity onPress={() => {navigation.openDrawer()}}>
+                <ImageBackground
+                    source={require("../images/lockedImage.png")}
+                    style={{width: '100%', height: 2.6 * windowHeight/3, marginTop: 10}}
+                    blurRadius={10}
+                >
+                    <View style={{flex: 1, height: '100%', justifyContent: 'center', alignItems: 'center'}}>
+                        <Icon name='lock' size={80}/>
+                    </View>
+                </ImageBackground>
+            </TouchableOpacity>            
         </View>
         }
 
@@ -236,7 +238,8 @@ const styles = StyleSheet.create({
     planUpgradeContainer: {
         height: 100,
         alignItems: 'center',
-        padding: 10
+        padding: 10,
+        backgroundColor: '#fff',
     },
     addPostContainer: {
         flexDirection: 'row',

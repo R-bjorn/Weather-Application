@@ -237,7 +237,8 @@ const styles = StyleSheet.create({
     planUpgradeContainer: {
         height: 100,
         alignItems: 'center',
-        padding: 10
+        padding: 10,
+        backgroundColor: '#fff'
     },
     addPostContainer: {
         flexDirection: 'row',

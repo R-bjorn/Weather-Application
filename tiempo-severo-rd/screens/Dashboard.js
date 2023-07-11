@@ -28,7 +28,6 @@ const Dashboard = ({ navigation}) => {
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = () => {
         setRefreshing(true);
-        console.log("User profile Image : ", user?.profileImage)
         fetchMaps();
         fetchNews()
           .finally(() => {
@@ -47,7 +46,7 @@ const Dashboard = ({ navigation}) => {
             try {
                 const userDoc = collection(db, 'users');
                 if(uid){
-                    // console.log("UID of current user", uid);
+                    console.log("UID of current user", uid);
                     const currentUserRef = doc(userDoc, uid);
 
                     const userSnapshot = await getDoc(currentUserRef);
@@ -69,8 +68,8 @@ const Dashboard = ({ navigation}) => {
     const usersCollectionRef = firebase.firestore().collection('users');
     // Query the collection and retrieve the roles of each user
     usersCollectionRef.doc(user?.uid).get()
-    .then((doc) => { setRole(doc.data().role); })
-    .catch((error) => { console.log('Error getting users:', error); });
+    .then((doc) => { if(role) {setRole(doc.data().role);} })
+    .catch((error) => { console.log('Error getting users: (Dashboard) ', error); });
 
     // Maps data variables and fetching map data
     const [mapsData, setMapsData] = useState([]);
