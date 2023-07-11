@@ -11,51 +11,76 @@ import { useNavigation } from '@react-navigation/native';
 
 // Firebase
 import { useAuth } from "../hooks/useAuth";
-import { firebase } from "../config";
-// import { fetchMapsData } from "../components/FetchMapData";
-import { collection, query, getDocs } from 'firebase/firestore';
-// import { firebase } from '../config';
-
+import { firebase, db } from "../config";
+import { collection, query, doc, limit, getDocs, getDoc } from 'firebase/firestore';
 // Import other components
 import Maps from '../components/Maps';
+import LatestNews from '../components/LatestNews';
 import Icon from "@expo/vector-icons/FontAwesome"
 
 var {Platform} = React;
 
 const Dashboard = ({ navigation}) => {
-
+    // Navigation 
     navigation = useNavigation();
-    const [refreshing, setRefreshing] = useState(false);
 
+    // Refreshing new Data
+    const [refreshing, setRefreshing] = useState(false);
     const onRefresh = () => {
         setRefreshing(true);
-        fetchMaps()
+        console.log("User profile Image : ", user?.profileImage)
+        fetchMaps();
+        fetchNews()
           .finally(() => {
             setRefreshing(false);
           });
-      };
+    };
 
+    // User authentication and getting user data
     const { user } = useAuth();
     const username = (user?.displayName === ' ') ? 'user' : user?.displayName;
     const [role, setRole] = useState('');
+    const uid = user?.uid;
+    const [userImage, setUserImage] = useState('');
+    useEffect(() => {
+        const fetchProfileImage = async () => {
+            try {
+                const userDoc = collection(db, 'users');
+                if(uid){
+                    // console.log("UID of current user", uid);
+                    const currentUserRef = doc(userDoc, uid);
 
+                    const userSnapshot = await getDoc(currentUserRef);
+                    const userData = userSnapshot.data();
+            
+                    setUserImage(userData.profileImage);
+                }
+            } catch (error) {
+                // Handle the error appropriately
+                console.log("Error - User Image :" , error)
+            }
+        };
+
+        fetchProfileImage();
+    }, [uid]);
+
+    // Getting user role 
     // Get a reference to the 'users' collection
     const usersCollectionRef = firebase.firestore().collection('users');
-
     // Query the collection and retrieve the roles of each user
     usersCollectionRef.doc(user?.uid).get()
     .then((doc) => { setRole(doc.data().role); })
     .catch((error) => { console.log('Error getting users:', error); });
 
+    // Maps data variables and fetching map data
     const [mapsData, setMapsData] = useState([]);
-
     const fetchMapsData = async (userRole) => {
         const mapsCollectionRef = collection(firebase.firestore(), 'maps');
         
         let mapsQuery = query(mapsCollectionRef);
         if (userRole === 4) {
           // Limit to 5 latest maps for free users
-          mapsQuery = query(mapsCollectionRef, orderBy('createdAt', 'desc'), limit(5));
+          mapsQuery = query(mapsCollectionRef, limit(5));
         }
       
         const querySnapshot = await getDocs(mapsQuery);
@@ -70,18 +95,44 @@ const Dashboard = ({ navigation}) => {
         
         return mapsData;
     };
-
     const fetchMaps = async () => {
         const data = await fetchMapsData(role);
         setMapsData(data);
     };
-
     useEffect(() => {    
         fetchMaps();
       }, [role]);
 
+    
+    // Latest News data variables and fetching latest news 
+    const [latestNewsData, setLatestNewsData] = useState([]);
+    const fetchLatestNewsData = async () => {
+        const newsCollectionRef = collection(firebase.firestore(), 'news');
+        
+        let newsQuery = query(newsCollectionRef,  limit(1));
+      
+        const querySnapshot = await getDocs(newsQuery);
+        
+        const newsData = querySnapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            image: doc.data().NewsImage,
+            description: doc.data().Description,
+          };
+        });
+        
+        return newsData;
+    };
+    const fetchNews = async () => {
+        const data = await fetchLatestNewsData();
+        setLatestNewsData(data);
+    };
+    useEffect(() => {    
+        fetchNews();
+      }, [role]);
+
+    // UI of Dashboard
     return (
-    // </LinearGradient>
     <SafeAreaView style={{flex: 1}}>
         <StatusBar 
             backgroundColor={(Platform.OS === 'ios') ? "#fff" : "#f1f1f1"}
@@ -93,7 +144,7 @@ const Dashboard = ({ navigation}) => {
             <Text style={styles.userName}>Hello, {username}!</Text>
             <TouchableOpacity style={styles.profileImage} onPress={() => {navigation.openDrawer()}}>
                 <ImageBackground 
-                    source={require('../images/profile.jpg')}
+                    source={(userImage) ? {uri: userImage} : require('../images/profile.jpg')}
                     style={{width: 35, height: 35}}
                     imageStyle={{borderRadius: 25}}
                 />
@@ -119,29 +170,17 @@ const Dashboard = ({ navigation}) => {
                 <Text style={{fontSize: 20, fontWeight: 600}}>Add News</Text>
             </TouchableOpacity>
         </View>
-
         : null
         }
 
         {/* Latest News Content */}
-        <View style={[styles.latestNews]}>
-            <View style={[styles.latestNewsText]}>
-                <Text style={{textAlign: 'center',
-                            fontWeight: 'bold',
-                            fontVariant: 'small-caps',
-                            fontSize: (Platform.OS === 'ios') ? 25 : 20
-                            }}>
-                    Breaking News
-                </Text>
-                <Text style={{textAlign: 'justify', marginTop: 5, fontSize: (Platform.OS === 'ios') ? 15 : 10}}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                </Text>
-            </View>
-            <Image 
-                source={require('../images/Welcome_BG.jpg')}
-                style={[styles.latestNewsImage]}
-            />
-        </View>
+        {latestNewsData.length > 0 ? (
+        latestNewsData.map((map) => (
+            <LatestNews key={map.id} image={map.image} description={map.description} />
+        ))
+        ) : (
+            null
+        )}
 
         {/* All Maps Scrolable Content */}
         <ScrollView style={styles.mapsViewContainer}
@@ -173,9 +212,10 @@ const Dashboard = ({ navigation}) => {
         </View>        
         : null}
     </SafeAreaView>
-  )
+    )
 }
 
+// Styles of dashbaord UI
 const styles = StyleSheet.create({
     userInfo: {
         flexDirection: 'row', 
@@ -194,25 +234,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         alignSelf: 'center',
         marginTop : (Platform.OS === 'ios') ? 0 : 5,
-    },
-    latestNews: {
-        marginTop: 10,
-        flexDirection: 'row',
-        height: 200,
-        alignItems: 'center',
-        borderTopWidth: 2,
-        borderBottomWidth: 2,
-        paddingTop: 20,
-        paddingBottom: 20,
-    },
-    latestNewsText: {
-        flex: 1,
-        padding: 20,
-    },
-    latestNewsImage: {
-        flex: 1,
-        height: '100%',
-        resizeMode: 'cover'
     },
     mapsViewContainer: {
         flex: 1,

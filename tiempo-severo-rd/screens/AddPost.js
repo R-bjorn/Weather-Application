@@ -1,7 +1,7 @@
 import { 
     View, Text, StyleSheet, 
     SafeAreaView, TextInput,
-    Image, TouchableOpacity, ScrollView
+    Image, TouchableOpacity, ScrollView, Dimensions
 } from 'react-native'
 import React, {useState, useEffect} from 'react'
 import Icon from "@expo/vector-icons/FontAwesome"
@@ -10,6 +10,7 @@ import { auth, db, storage } from '../config';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigation } from '@react-navigation/native';
 import { addDoc, collection } from 'firebase/firestore';
+import { Dropdown } from 'react-native-element-dropdown';
 
 const AddPost = ({ navigation}) => {
     navigation = useNavigation();
@@ -17,6 +18,12 @@ const AddPost = ({ navigation}) => {
     const [mapDesc, setDesc] = useState(null)
     const [mapImage, setMapImage] = useState(null)
     const [selectedImage, setSelectedImage] = useState(null)
+    const [countryValue, setCountryValue] = useState(null);
+    const [isFocus, setIsFocus] = useState(false);
+    const countries = [
+        { label: 'Puerto Rico', value: '1' },
+        { label: 'Dominican Republican', value: '2' },
+    ];
     
     // Upload image on firebase storage
     const uploadImage = async () => {
@@ -111,11 +118,12 @@ const AddPost = ({ navigation}) => {
     const uploadPost = async () => {
         // console.log("Desc : " + mapDesc);
         // console.log("Image : " + mapImage);
-        if(mapImage && mapDesc){
+        if(mapImage && mapDesc && countryValue){
             try {
                 const docRef = await addDoc(collection(db, 'maps'), {
                     Description: mapDesc,
-                    MapImage: mapImage 
+                    MapImage: mapImage,
+                    MapCountry: countries[countryValue - 1].label
                 });
                 alert("Successfully uploaded post")
                 navigation.goBack();
@@ -163,6 +171,27 @@ const AddPost = ({ navigation}) => {
                         style={{width: '100%', height: 350}}
                     />
                 </TouchableOpacity>
+                <Dropdown
+                            style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            iconStyle={styles.iconStyle}
+                            data={countries}
+                            search
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={!isFocus ? 'Select country' : '...'}
+                            searchPlaceholder="Search..."
+                            value={countryValue}
+                            onFocus={() => setIsFocus(true)}
+                            onBlur={() => setIsFocus(false)}
+                            onChange={item => {
+                                setCountryValue(item.value);
+                                setIsFocus(false);
+                            }}
+                />
             </View>
 
             {/* Upload Btn */}
@@ -171,7 +200,7 @@ const AddPost = ({ navigation}) => {
                     <Text style={styles.postImageBtnText}>Upload image</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.postBtn} onPress={() => {uploadPost()}}>
-                    <Text style={styles.postBtnText}>Upload</Text>
+                    <Text style={styles.postBtnText}>Post</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -181,6 +210,7 @@ const AddPost = ({ navigation}) => {
 
 export default AddPost
 
+const windowWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#4967a4', 
@@ -243,7 +273,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         marginVertical: 30,
         width: 300,  
-        height: 80,      
+        height: 60,      
         borderRadius: 50,
         shadowColor: 'black', 
         shadowOffset: { height: 10, width: 5}, 
@@ -259,5 +289,29 @@ const styles = StyleSheet.create({
         color: "#4967a4",
         fontSize: 35,
         fontWeight: 700
-      }
+      },
+      dropdown: {
+        backgroundColor: "#fff",
+        width: "100%",
+        height: 50,
+        borderColor: 'gray',
+        borderBottomWidth: 0.5,
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        marginVertical: 10
+    },
+    placeholderStyle: {
+        fontSize: 16,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+    },
+    iconStyle: {
+        width: 20,
+        height: 20,
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
+    },
 })

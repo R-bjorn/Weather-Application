@@ -1,50 +1,111 @@
 // Import react components
-import { View, Text, Image, 
+import { 
+    View, Text, Image, 
     StyleSheet, SafeAreaView, 
     ScrollView, TouchableOpacity, 
-    ImageBackground, StatusBar,
-    Dimensions
+    ImageBackground, StatusBar, 
+    Dimensions, RefreshControl 
 } from 'react-native'
-import React, { useState} from 'react'
+import React, {useState, useEffect}from 'react'
+
+// Firebase
+import { useAuth } from "../hooks/useAuth";
+import { firebase } from "../config";
+import { collection, query, where, limit, getDocs } from 'firebase/firestore';
 
 // Import other components
 import Maps from '../components/Maps';
-import { useAuth } from "../hooks/useAuth";
-import { firebase } from "../config";
+import LatestNews from '../components/LatestNews';
 import Icon from "@expo/vector-icons/FontAwesome"
 
 // Global Variables
 var {Platform} = React;
 const windowHeight = Dimensions.get('window').height;
 
-
-// TODO : only admin can change the data
-
 const Dashboard = ({ navigation} ) => {
+
+    // Refreshing new Data
+    const [refreshing, setRefreshing] = useState(false);
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchMaps();
+        fetchNews()
+          .finally(() => {
+            setRefreshing(false);
+          });
+    };
+
+    // User authentication and getting user data
     const { user } = useAuth();
     const [role, setRole] = useState('');
-
+    // Getting user role 
     // Get a reference to the 'users' collection
     const usersCollectionRef = firebase.firestore().collection('users');
-
     // Query the collection and retrieve the roles of each user
-    usersCollectionRef
-    .doc(user?.uid)
-    .get()
-    .then((doc) => {
-        if (doc.exists) {
-            // Access the fields of the document
-            setRole(doc.data().role);
-        } else {
-            console.log('No such document!');
+    usersCollectionRef.doc(user?.uid).get()
+    .then((doc) => { setRole(doc.data().role); })
+    .catch((error) => { console.log('Error getting users:', error); });
+
+    // Maps data variables and fetching map data
+    const [mapsData, setMapsData] = useState([]);
+    const fetchMapsData = async (userRole) => {
+        const mapsCollectionRef = collection(firebase.firestore(), 'maps');
+        
+        let mapsQuery = query(mapsCollectionRef, where("MapCountry", "==", "Puerto Rico"));
+        if (userRole === 4) {
+          // Limit to 5 latest maps for free users
+          mapsQuery = query(mapsCollectionRef, limit(5));
         }
-    })
-    .catch((error) => {
-        console.log('Error getting users:', error);
-    });
+      
+        const querySnapshot = await getDocs(mapsQuery);
+        
+        const mapsData = querySnapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            image: doc.data().MapImage,
+            description: doc.data().Description,
+          };
+        });
+        
+        return mapsData;
+    };
+    const fetchMaps = async () => {
+        const data = await fetchMapsData(role);
+        setMapsData(data);
+    };
+    useEffect(() => {    
+        fetchMaps();
+    }, [role]);
+
+    // Latest News data variables and fetching latest news 
+    const [latestNewsData, setLatestNewsData] = useState([]);
+    const fetchLatestNewsData = async () => {
+        const newsCollectionRef = collection(firebase.firestore(), 'news');
+        
+        let newsQuery = query(newsCollectionRef, where("NewsCountry", "==", "Puerto Rico"), limit(1));
+      
+        const querySnapshot = await getDocs(newsQuery);
+        
+        const newsData = querySnapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            image: doc.data().NewsImage,
+            description: doc.data().Description,
+          };
+        });
+        
+        return newsData;
+    };
+    const fetchNews = async () => {
+        const data = await fetchLatestNewsData();
+        setLatestNewsData(data);
+    };
+    useEffect(() => {    
+        fetchNews();
+      }, [role]);
 
     
-  return (
+    return (
     <SafeAreaView style={{flex: 1}}>
         <StatusBar 
             backgroundColor={(Platform.OS === 'ios') ? "#fff" : "#f1f1f1"}
@@ -65,62 +126,38 @@ const Dashboard = ({ navigation} ) => {
             
         </View>
 
-        {/* Admin content to upload posts and breaking news */}
-        {(role === 0)
-        ? <View style={styles.addPostContainer}>
-            <TouchableOpacity style={styles.postButton}>
-                <Icon name="plus" size={20}/>
-                <Text style={{fontSize: 20, fontWeight: 600}}>Add post</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.postButton}>
-                <Icon name="plus" size={20}/>
-                <Text style={{fontSize: 20, fontWeight: 600}}>Add News</Text>
-            </TouchableOpacity>
-        </View>
-
-        : null
-        }
-
         { (role === 2 || role === 1 || role === 0) 
         ?
         // Content for Dominican Republican users
         <View style={{flex:1, }}>
                         
             {/* Latest News Content */}
-            <View style={[styles.latestNews]}>
-                <View style={[styles.latestNewsText]}>
-                    <Text style={{textAlign: 'center',
-                                fontWeight: 'bold',
-                                fontVariant: 'small-caps',
-                                fontSize: (Platform.OS === 'ios') ? 25 : 20
-                                }}>
-                        Breaking News
-                    </Text>
-                    <Text style={{textAlign: 'justify', marginTop: 5, fontSize: (Platform.OS === 'ios') ? 15 : 10}}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                    </Text>
-                </View>
-                <Image 
-                    source={require('../images/Welcome_BG.jpg')}
-                    style={[styles.latestNewsImage]}
-                />
-            </View>
+            {latestNewsData.length > 0 ? (
+            latestNewsData.map((map) => (
+                <LatestNews key={map.id} image={map.image} description={map.description} />
+            ))
+            ) : (
+                null
+            )}
 
             {/* All Maps Scrolable Content */}
-            <ScrollView style={[styles.mapsViewContainer]}>
+            <ScrollView 
+                style={[styles.mapsViewContainer]}
+                refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
+                }
+            >
                 <View >
-                    < Maps />
-
-                    < Maps />
-
-                    < Maps />
-
-                    < Maps />
-
-                    < Maps />
-
-                    < Maps />
+                    {mapsData.length > 0 ? (
+                    mapsData.map((map) => (
+                        <Maps key={map.id} image={map.image} description={map.description} />
+                    ))
+                    ) : (
+                    <Text>No maps available</Text>
+                    )}
                 </View>
             </ScrollView>
         </View>

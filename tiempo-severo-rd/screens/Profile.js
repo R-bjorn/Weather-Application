@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
     ImageBackground, 
     Image, StyleSheet, 
@@ -18,10 +18,36 @@ import { Dropdown } from 'react-native-element-dropdown';
 import * as ImagePicker from 'expo-image-picker';
 import { auth, db, storage } from '../config';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { collection, updateDoc, doc, getDoc   } from 'firebase/firestore';
 
 const Profile = ({navigation}) => {
     const { user } = useAuth();
     const username = (user?.displayName === '') ? 'user' : user?.displayName;
+    const uid = user?.uid;
+    const [userImage, setUserImage] = useState('');
+    useEffect(() => {
+        const fetchProfileImage = async () => {
+            try {
+                const userDoc = collection(db, 'users');
+                if(uid){
+                    // console.log("UID of current user", uid);
+                    const currentUserRef = doc(userDoc, uid);
+
+                    const userSnapshot = await getDoc(currentUserRef);
+                    const userData = userSnapshot.data();
+            
+                    setUserImage(userData.profileImage);
+                }
+            } catch (error) {
+                // Handle the error appropriately
+                console.log("Error - User Image :" , error)
+            }
+        };
+
+        fetchProfileImage();
+    }, [uid]);
+    
+
     const countries = [
         { label: 'Puerto Rico', value: '1' },
         { label: 'Dominican Republican', value: '2' },
@@ -31,12 +57,11 @@ const Profile = ({navigation}) => {
     const [isFocus, setIsFocus] = useState(false);
 
     const [profileImage, setProfileImage] = useState('')
-    const [selectedImage, setSelectedImage] = useState('')
+    const [selectedImage, setSelectedImage] = useState('');
     
     // Upload image on firebase storage
     const uploadImage = async () => {
         // Convert image into blob image
-        // const blobImage = null;
         const blobImage = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.onload = function() {
@@ -67,13 +92,13 @@ const Profile = ({navigation}) => {
         (snapshot) => {
             // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log('Upload is ' + progress + '% done');
+            // console.log('Upload is ' + progress + '% done');
             switch (snapshot.state) {
             case 'paused':
-                console.log('Upload is paused');
+                // console.log('Upload is paused');
                 break;
             case 'running':
-                console.log('Upload is running');
+                // console.log('Upload is running');
                 break;
             }
         }, 
@@ -98,12 +123,15 @@ const Profile = ({navigation}) => {
         () => {
             // Upload completed successfully, now we can get the download URL
             getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            console.log('File available at', downloadURL);
+            // console.log('File available at', downloadURL);
+                console.log("Upload image successfull")
+                setProfileImage(downloadURL)
             });
-            setProfileImage(downloadURL)
-            alert('Successfully updated profile!');
         }
         );
+
+        updateProfileImage();
+        
     }
 
     // Select image from library
@@ -118,6 +146,24 @@ const Profile = ({navigation}) => {
 
         if (!result.canceled) {
             setSelectedImage(result.assets[0].uri);
+        }
+    }
+
+    const updateProfileImage = async () => {
+        if(profileImage){
+            try {
+                const usersCollectionRef = collection(db, 'users');
+                const uid = user?.uid;
+                // console.log("UID of current user", uid);
+                const currentUserRef = doc(usersCollectionRef, uid);
+
+                await updateDoc(currentUserRef, {
+                    profileImage: profileImage,
+                });
+                alert('Successfully updated profile!');
+            } catch (error) {
+                alert('Error : ' , error);
+            }   
         }
     }
 
@@ -141,22 +187,24 @@ const Profile = ({navigation}) => {
                         <Icon name='bars' size={20} style={{right: (Platform.OS === 'ios') ? 170 : 180, top: (Platform.OS === 'ios') ? 70 : 50}}/>
                     </TouchableOpacity>
                     {/* Background Image '+' icon */}
-                    <TouchableOpacity 
+                    {/* <TouchableOpacity 
                         // TODO : Add function to change the background image for user profile
                         onPress={() => {}}
                     >
                         <Icon name='plus-circle' size={30} style={{left: (Platform.OS === 'ios') ? 170 : 180, top: 155}}/>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     {/* Profile Image */}
-                    <View style={{top: 100}}>
+                    <View style={{top: 110}}>
                         {/* Profile Image '+' icon */}
                         <TouchableOpacity
                             // TODO : Add function to select photo from galery and add it on user storage firebase
                             onPress={() => {selectImage()}}
                         >
                             <Image
-                                source={(selectedImage) ? {uri: selectedImage} : require("../images/profile.jpg")}
+                                source={
+                                     userImage ? {uri: userImage} : require("../images/profile.jpg")
+                                }
                                 style={styles.profile}
                             />
                             <Icon name='plus-circle' size={30} style={{left: 90, bottom: 33}}/>

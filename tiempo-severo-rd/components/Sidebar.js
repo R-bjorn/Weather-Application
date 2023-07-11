@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     View,
     StyleSheet,
@@ -15,10 +15,36 @@ import {
 import Icon from "@expo/vector-icons/FontAwesome";
 import { firebase } from "../config";
 import { useAuth } from "../hooks/useAuth";
+import { auth, db, storage } from '../config';
+import { collection, updateDoc, doc, getDoc   } from 'firebase/firestore';
 
 const Sidebar = (props) => {
     const { user } = useAuth();
     const username = (user?.displayName === '') ? 'user' : user?.displayName;
+    const uid = user?.uid;
+    const [userImage, setUserImage] = useState('');
+    useEffect(() => {
+        const fetchProfileImage = async () => {
+            try {
+                const userDoc = collection(db, 'users');
+                if(uid){
+                    // console.log("UID of current user", uid);
+                    const currentUserRef = doc(userDoc, uid);
+
+                    const userSnapshot = await getDoc(currentUserRef);
+                    const userData = userSnapshot.data();
+            
+                    setUserImage(userData.profileImage);
+                }
+            } catch (error) {
+                // Handle the error appropriately
+                console.log("Error - User Image :" , error)
+            }
+        };
+
+        fetchProfileImage();
+    }, [uid]);
+
     return (
         <View style={{flex: 1}}>
             <DrawerContentScrollView {...props}>
@@ -27,7 +53,7 @@ const Sidebar = (props) => {
                     style={styles.imageBackground}
                 >
                     <Image
-                        source={require("../images/profile.jpg")}
+                        source={userImage ? {uri: userImage} : require("../images/profile.jpg")}
                         style={styles.profile}
                     />
                     <Text style={styles.profileName}>{username}</Text>
