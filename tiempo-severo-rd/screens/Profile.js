@@ -184,7 +184,7 @@ const Profile = ({navigation}) => {
                     <TouchableOpacity 
                         onPress={() => {navigation.toggleDrawer()}}
                     >
-                        <Icon name='bars' size={20} style={{right: (Platform.OS === 'ios') ? 170 : 180, top: (Platform.OS === 'ios') ? 70 : 50}}/>
+                        <Icon name='bars' size={20} style={{right: (Platform.OS === 'ios') ? 170 : 180, top: (Platform.OS === 'ios') ? 70 : 30}}/>
                     </TouchableOpacity>
                     {/* Background Image '+' icon */}
                     {/* <TouchableOpacity 

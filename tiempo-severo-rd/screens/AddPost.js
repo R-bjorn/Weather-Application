@@ -1,7 +1,7 @@
 import { 
     View, Text, StyleSheet, 
     SafeAreaView, TextInput,
-    Image, TouchableOpacity, ScrollView, Dimensions
+    Image, TouchableOpacity, ScrollView, Dimensions, Platform
 } from 'react-native'
 import React, {useState, useEffect} from 'react'
 import Icon from "@expo/vector-icons/FontAwesome"
@@ -142,67 +142,69 @@ const AddPost = ({ navigation}) => {
             {/* Title */}
             <View style={styles.title}>
                 <TouchableOpacity onPress={() => {navigation.goBack()}}>
-                    <Icon name="chevron-left" size={30}/>
+                    <Icon name="chevron-left" size={30} style={{ top:  (Platform.OS === 'android') ? 12 : 0}}/>
                 </TouchableOpacity>
                 <Text style={styles.header}>Add a post</Text>            
             </View>
 
-            {/* Collection of data */}
-            <View 
-                style={styles.inputContainer}
-            >
-                <TextInput
-                    multiline={true}
-                    numberOfLines={5}
-                    returnKeyType="done"
-                    style={styles.inputDescription}
-                    onChangeText={(value) => {setDesc(value)}}
-                    // value={''}
-                    placeholder="What's on your mind..."
-                    blurOnSubmit={true}
-                    keyboardType="default"
-                />
-                <TouchableOpacity 
-                    style={styles.imagePicker}
-                    onPress={() => {selectImage()}}
+            <ScrollView>
+                {/* Collection of data */}
+                <View 
+                    style={styles.inputContainer}
                 >
-                    <Image 
-                        source={(selectedImage) ? {uri: selectedImage} : require("../images/unknownImage.png")}
-                        style={{width: '100%', height: 350}}
+                    <TextInput
+                        multiline={true}
+                        numberOfLines={5}
+                        returnKeyType="done"
+                        style={styles.inputDescription}
+                        onChangeText={(value) => {setDesc(value)}}
+                        // value={''}
+                        placeholder="What's on your mind..."
+                        blurOnSubmit={true}
+                        keyboardType="default"
                     />
-                </TouchableOpacity>
-                <Dropdown
-                            style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            iconStyle={styles.iconStyle}
-                            data={countries}
-                            search
-                            maxHeight={300}
-                            labelField="label"
-                            valueField="value"
-                            placeholder={!isFocus ? 'Select country' : '...'}
-                            searchPlaceholder="Search..."
-                            value={countryValue}
-                            onFocus={() => setIsFocus(true)}
-                            onBlur={() => setIsFocus(false)}
-                            onChange={item => {
-                                setCountryValue(item.value);
-                                setIsFocus(false);
-                            }}
-                />
-            </View>
+                    <TouchableOpacity 
+                        style={styles.imagePicker}
+                        onPress={() => {selectImage()}}
+                    >
+                        <Image 
+                            source={(selectedImage) ? {uri: selectedImage} : require("../images/unknownImage.png")}
+                            style={{width: '100%', height: 350}}
+                        />
+                    </TouchableOpacity>
+                    <Dropdown
+                                style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                iconStyle={styles.iconStyle}
+                                data={countries}
+                                search
+                                maxHeight={300}
+                                labelField="label"
+                                valueField="value"
+                                placeholder={!isFocus ? 'Select country' : '...'}
+                                searchPlaceholder="Search..."
+                                value={countryValue}
+                                onFocus={() => setIsFocus(true)}
+                                onBlur={() => setIsFocus(false)}
+                                onChange={item => {
+                                    setCountryValue(item.value);
+                                    setIsFocus(false);
+                                }}
+                    />
+                </View>
 
-            {/* Upload Btn */}
-            <View style={styles.postBtnContainer}>
-                <TouchableOpacity style={styles.postImageBtn} onPress={() => {uploadImage()}}>
-                    <Text style={styles.postImageBtnText}>Upload image</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.postBtn} onPress={() => {uploadPost()}}>
-                    <Text style={styles.postBtnText}>Post</Text>
-                </TouchableOpacity>
-            </View>
+                {/* Upload Btn */}
+                <View style={styles.postBtnContainer}>
+                    <TouchableOpacity style={styles.postImageBtn} onPress={() => {uploadImage()}}>
+                        <Text style={styles.postImageBtnText}>Upload image</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.postBtn} onPress={() => {uploadPost()}}>
+                        <Text style={styles.postBtnText}>Post</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
         </View>
     </>
     )
@@ -235,16 +237,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
       },
       inputContainer : {
-        paddingHorizontal: 15,
-        marginTop: 40
+        paddingHorizontal: (Platform.OS === 'ios') ? 15 : 12,
+        marginTop: (Platform.OS === 'ios') ? 40 : 10
       },
       inputDescription: {
         backgroundColor: '#fff',
-        paddingTop: 15,
+        paddingTop: (Platform.OS === 'ios') ? 15 : 0,
         paddingBottom: 40,
         paddingHorizontal: 10,
         marginVertical: 15,
-        maxHeight: 150
+        maxHeight: (Platform.OS === 'ios') ? 150 : 120
       },
       imagePicker: {
         backgroundColor: '#fff'
@@ -258,7 +260,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#2c3e62',
         marginTop: 5,
-        width: 100,  
+        width: (Platform.OS === 'ios') ? 100 : 200,  
         height: 30,      
         borderRadius: 50,
         shadowColor: 'black', 
@@ -271,7 +273,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
-        marginVertical: 30,
+        marginVertical: (Platform.OS === 'ios') ? 30 : 10,
         width: 300,  
         height: 60,      
         borderRadius: 50,

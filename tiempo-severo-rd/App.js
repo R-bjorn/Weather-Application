@@ -9,7 +9,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import React, { useState, useEffect} from 'react';
 import { firebase } from './config';
 import Icon from '@expo/vector-icons/FontAwesome';
-import { useAuth } from "./hooks/useAuth";
 
 // Screens and Pages
 import { Dashboard } from './screens';
@@ -17,6 +16,8 @@ import { AddPost, AddNews, Profile} from './screens'
 import { Login, SignUp, Welcome} from "./screens";
 import { PuertoRico, DominicanRepublican, Notifications, UpgradePlan} from './screens';
 import Sidebar from './components/Sidebar';
+
+// import { StripeProvider } from '@stripe/stripe-react-native/src/components/StripeProvider';
 
 // Navigation Containers
 const Stack = createNativeStackNavigator();

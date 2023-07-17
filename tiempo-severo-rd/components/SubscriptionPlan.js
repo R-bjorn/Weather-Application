@@ -41,10 +41,10 @@ const SubscriptionPlan = (props) => {
           {(props.price == 0) ? <Text>free limited maps</Text> : <Text>$ {props.price} / month</Text>}
 
           {/* Plan Benifits */}
-          <View style={{paddingVertical: 10}}>
-            {(props.benifit1) ? <Text style={{ fontSize: 17, color: "#757575", marginBottom: 5 }}>{`\u2023 ${props.benifit1}`}</Text> : null} 
-            {(props.benifit2) ? <Text style={{ fontSize: 17, color: "#757575", marginBottom: 5 }}>{`\u2023 ${props.benifit2}`}</Text> : null} 
-            {(props.benifit3) ? <Text style={{ fontSize: 17, color: "#757575", marginBottom: 5 }}>{`\u2023 ${props.benifit3}`}</Text> : null} 
+          <View style={{paddingVertical: (Platform.OS === 'ios') ? 10 : 5}}>
+            {(props.benifit1) ? <Text style={{ fontSize: (Platform.OS === 'ios') ? 17 : 13, color: "#757575", marginBottom: 5 }}>{`\u2023 ${props.benifit1}`}</Text> : null} 
+            {(props.benifit2) ? <Text style={{ fontSize: (Platform.OS === 'ios') ? 17 : 13, color: "#757575", marginBottom: 5 }}>{`\u2023 ${props.benifit2}`}</Text> : null} 
+            {(props.benifit3) ? <Text style={{ fontSize: (Platform.OS === 'ios') ? 17 : 13, color: "#757575", marginBottom: 5 }}>{`\u2023 ${props.benifit3}`}</Text> : null} 
           </View>
 
           {/* Purchase Button */}
@@ -76,7 +76,7 @@ const SubscriptionPlan = (props) => {
 
 const styles=StyleSheet.create({
   container: {
-    height: 180, 
+    height: (Platform.OS === 'ios') ? 180 : 200, 
     backgroundColor: 'white', 
     justifyContent: 'center', 
     alignItems: 'center', 
@@ -93,12 +93,12 @@ const styles=StyleSheet.create({
     width: "45%", 
     flex: 1, 
     paddingHorizontal: 15, 
-    paddingVertical: 5
+    paddingVertical: (Platform.OS === 'ios') ? 5 : 0
   },
   planUser: {
-    fontSize: 20, 
+    fontSize: (Platform.OS === 'ios') ? 20 : 17, 
     fontWeight: 800, 
-    marginBottom: 2
+    marginBottom: (Platform.OS === 'ios') ? 2 : 0
   },
   purchaseBtn: {
     width: 100, 

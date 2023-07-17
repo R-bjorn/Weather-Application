@@ -17,14 +17,20 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": ["Give $(PRODUCT_NAME) permission to save photos"]
-      }
+        "NSPhotoLibraryUsageDescription": [
+          "Give $(PRODUCT_NAME) permission to save photos"
+        ]
+      },
+      "bundleIdentifier": "com.huracanescribe.tiempo-severo-rd"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,8 +40,17 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
+        },
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.tiempo-severo-rd"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "790b0d6c-8ee8-4e67-98d5-4f021838d9db"
+      }
+    }
   }
 }

@@ -5,7 +5,8 @@ import SubscriptionPlan from "../components/SubscriptionPlan";
 
 import {useEffect, useState} from "react";
 import { useAuth } from "../hooks/useAuth";
-import { firebase } from "../config";
+import { firebase, db } from "../config";
+import { collection, doc, getDoc   } from 'firebase/firestore';
 
 var {Platform} = React;
 
@@ -13,6 +14,29 @@ var {Platform} = React;
 const Dashboard = ({ navigation} ) => {
   const { user } = useAuth();
   const [role, setRole] = useState('');
+  const uid = user?.uid;
+    const [userImage, setUserImage] = useState('');
+    useEffect(() => {
+        const fetchProfileImage = async () => {
+            try {
+                const userDoc = collection(db, 'users');
+                if(uid){
+                    // console.log("UID of current user", uid);
+                    const currentUserRef = doc(userDoc, uid);
+
+                    const userSnapshot = await getDoc(currentUserRef);
+                    const userData = userSnapshot.data();
+            
+                    setUserImage(userData.profileImage);
+                }
+            } catch (error) {
+                // Handle the error appropriately
+                console.log("Error - User Image :" , error)
+            }
+        };
+
+        fetchProfileImage();
+    }, [uid]);
 
   // Get a reference to the 'users' collection
   const usersCollectionRef = firebase.firestore().collection('users');
@@ -44,7 +68,7 @@ const Dashboard = ({ navigation} ) => {
             </TouchableOpacity>
             <TouchableOpacity style={styles.profileImage} onPress={() => {navigation.openDrawer()}}>
                 <ImageBackground 
-                    source={require('../images/profile.jpg')}
+                    source={userImage ? {uri: userImage} : require('../images/profile.jpg')}
                     style={{width: 35, height: 35}}
                     imageStyle={{borderRadius: 25}}
                 />

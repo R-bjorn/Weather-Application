@@ -12,9 +12,11 @@
     "@react-native-community/blur": "^4.3.2",
     "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/native-stack": "^6.9.13",
+    "@stripe/stripe-react-native": "0.23.3",
     "@types/react": "~18.0.27",
     "expo": "~48.0.18",
     "expo-checkbox": "^2.3.1",
+    "expo-image-picker": "~14.1.1",
     "expo-status-bar": "~1.4.4",
     "firebase": "^9.23.0",
     "react": "18.2.0",
@@ -26,8 +28,11 @@
     "react-native-reanimated": "~2.14.4",
     "react-native-select-dropdown": "^3.3.4",
     "react-native-vector-icons": "^9.2.0",
+    "stripe": "^12.12.0",
     "typescript": "^4.9.4",
-    "expo-image-picker": "~14.1.1"
+    "react-native-web": "~0.18.10",
+    "react-dom": "18.2.0",
+    "@expo/webpack-config": "^18.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
