@@ -15,11 +15,11 @@ const SubscriptionPlan = (props) => {
   const { user } = useAuth();
   const [ready, setReady] = useState(false);
   const {initPaymentSheet, presentPaymentSheet, loading} = usePaymentSheet();
-  const planPrice = props.price.toString().replace('.','');
+  const planPrice = (props.user == 'Premium User') ? '799' : '499';
 
-  useEffect(() => {
-    initializePaymentSheet();
-  }, []);
+  // useEffect(() => {
+  //   initializePaymentSheet();
+  // }, []);
 
   const changeUserRole = (newRole) => {
     // Get a reference to the 'users' collection
@@ -68,6 +68,7 @@ const SubscriptionPlan = (props) => {
 
   const fetchPaymentSheetParams = async () => {
 
+      console.log("User : ", props.user , " - ", planPrice);
       const requestBody = {
         amount: planPrice
       };
@@ -98,6 +99,7 @@ const SubscriptionPlan = (props) => {
 
   async function purchasePlan() {
     // console.log('in purchase plan');
+    initializePaymentSheet();
     const {error} = await presentPaymentSheet();
 
     // After successfull payment
@@ -139,7 +141,7 @@ const SubscriptionPlan = (props) => {
             <View>
               <TouchableOpacity
                 style={[styles.purchaseBtn, {backgroundColor: (props.enable) ? "#aab5ff" : '#fff'}]}
-                onPress={() => {purchasePlan()}}
+                onPress={() => { (props.user == 'Free User') ? changeUserRole(props.userRole) : (!props.enable) ? purchasePlan() : null}}
               >
                 <Text style={{ 
                   color: (props.enable) ? "#fff": "#000",  
