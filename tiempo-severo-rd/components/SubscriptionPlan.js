@@ -25,7 +25,7 @@ const SubscriptionPlan = (props) => {
     // Get a reference to the 'users' collection
     const usersCollectionRef = firebase.firestore().collection('users');
 
-    console.log(user?.uid);
+    // console.log(user?.uid);
     // Query the collection and retrieve the roles of each user
     usersCollectionRef
     .doc(user?.uid)
@@ -37,7 +37,11 @@ const SubscriptionPlan = (props) => {
       console.log('Error updating role:', error);
     });
 
-    props.navigation.navigate("Login");
+    firebase.auth().signOut().then(function() {
+      // Sign-out successful.
+    }).catch(function(error) {
+      // An error happened.
+    })
   }
 
   const initializePaymentSheet = async () => {
@@ -93,7 +97,7 @@ const SubscriptionPlan = (props) => {
   };
 
   async function purchasePlan() {
-    console.log('in purchase plan');
+    // console.log('in purchase plan');
     const {error} = await presentPaymentSheet();
 
     // After successfull payment
@@ -161,7 +165,7 @@ const SubscriptionPlan = (props) => {
 
 const styles=StyleSheet.create({
   container: {
-    height: (Platform.OS === 'ios') ? 180 : 200, 
+    height: (Platform.OS === 'ios') ? 200 : 200, 
     backgroundColor: 'white', 
     justifyContent: 'center', 
     alignItems: 'center', 
@@ -178,10 +182,9 @@ const styles=StyleSheet.create({
     width: "45%", 
     flex: 1, 
     paddingHorizontal: 15, 
-    paddingVertical: (Platform.OS === 'ios') ? 5 : 0
   },
   planUser: {
-    fontSize: (Platform.OS === 'ios') ? 20 : 17, 
+    fontSize: (Platform.OS === 'ios') ? 18 : 17, 
     fontWeight: 800, 
     marginBottom: (Platform.OS === 'ios') ? 2 : 0
   },
