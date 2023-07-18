@@ -7,6 +7,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 // React Components
 import React, { useState, useEffect} from 'react';
+import { View, Text } from 'react-native';
 import { firebase } from './config';
 import Icon from '@expo/vector-icons/FontAwesome';
 
@@ -16,84 +17,101 @@ import { AddPost, AddNews, Profile} from './screens'
 import { Login, SignUp, Welcome} from "./screens";
 import { PuertoRico, DominicanRepublican, Notifications, UpgradePlan} from './screens';
 import Sidebar from './components/Sidebar';
-
-// import { StripeProvider } from '@stripe/stripe-react-native/src/components/StripeProvider';
+import SubscriptionPlan from "./components/SubscriptionPlan";
 
 // Navigation Containers
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 // App Layout 
-export default function App() {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+// export default function App() {
+//   const [initializing, setInitializing] = useState(true);
+//   const [user, setUser] = useState();
 
-  function onAuthStateChanged(user){
-    setUser(user);
-    if(initializing) setInitializing(false);
-  }
+//   function onAuthStateChanged(user){
+//     setUser(user);
+//     if(initializing) setInitializing(false);
+//   }
 
-  useEffect(() => {
-    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
+//   useEffect(() => {
+//     const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+//     return subscriber;
+//   }, []);
 
-  if(initializing) return null;
+//   if(initializing) return null;
 
-  if(!user){
-    return (
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName='Welcome'
-        >
-          <Stack.Screen
-            name="Welcome"
-            component={Welcome}
-            options={{
-              headerShown: false
-            }}
-          />
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{
-              headerShown: false
-            }}
-          />
-          <Stack.Screen
-            name="SignUp"
-            component={SignUp}
-            options={{
-              headerShown: false
-            }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+//   if(!user){
+//     return (
+//       <NavigationContainer>
+//         <Stack.Navigator
+//           initialRouteName='Welcome'
+//         >
+//           <Stack.Screen
+//             name="Welcome"
+//             component={Welcome}
+//             options={{
+//               headerShown: false
+//             }}
+//           />
+//           <Stack.Screen
+//             name="Login"
+//             component={Login}
+//             options={{
+//               headerShown: false
+//             }}
+//           />
+//           <Stack.Screen
+//             name="SignUp"
+//             component={SignUp}
+//             options={{
+//               headerShown: false
+//             }}
+//           />
+//         </Stack.Navigator>
+//       </NavigationContainer>
       
-    );
-  }
+//     );
+//   }
 
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Drawer">
-        <Stack.Screen
-          name="Drawer"
-          component={DrawerNavigation}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddPost"
-          component={AddPost}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddNews"
-          component={AddNews}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+//   return (
+//     <NavigationContainer>
+//       <Stack.Navigator initialRouteName="Drawer">
+//         <Stack.Screen
+//           name="Drawer"
+//           component={DrawerNavigation}
+//           options={{ headerShown: false }}
+//         />
+//         <Stack.Screen
+//           name="AddPost"
+//           component={AddPost}
+//           options={{ headerShown: false }}
+//         />
+//         <Stack.Screen
+//           name="AddNews"
+//           component={AddNews}
+//           options={{ headerShown: false }}
+//         />
+//       </Stack.Navigator>
+//     </NavigationContainer>
+//   );
+// }
+
+export default function App(){
+  return(
+    <View style={{alignItems: "center", marginTop: 400}}>
+      {/* <Text>Stripe Trial</Text> */}
+      <SubscriptionPlan 
+        user="Puerto Rico" 
+        price={4.99}  
+        benifit1="Rain and Thunder Maps"
+        benifit2="Hazardous Storm Risk"
+        benifit3="Wind Gust Risk"
+        enable={false}
+        image={require("./images/Puerto_rico.jpg")}
+        userRole = {2}
+      />
+    </View>
+  )
 }
 
 function DrawerNavigation() {
