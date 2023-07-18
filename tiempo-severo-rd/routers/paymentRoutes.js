@@ -5,16 +5,15 @@ const stripe =  require('stripe')
 
 router.post('/intents', async (req, res) => {
     try {
-        // const customer = await stripeInstance.customer.create();
-        // const emphemeralKey = await stripeInstance.emphemeralKey.create(
-        //     {customer: customer.id},
-        //     {apiVersion: '2022-11-15'}
-        // );
-        const paymentIntent = await stripeInstance.paymentIntent.create({
-            // amount: 499,
+        const customer = await stripe.customers.create();
+        const ephemeralKey = await stripe.ephemeralKeys.create(
+            {customer: customer.id},
+            {apiVersion: '2022-11-15'}
+        );
+        const paymentIntent = await stripe.paymentIntents.create({
             amount: req.body.amount,
             currency: 'usd',
-            // customer: customer.id,
+            customer: customer.id,
             automatic_payment_methods: {
                 enabled: true,
             },
@@ -22,13 +21,13 @@ router.post('/intents', async (req, res) => {
 
         res.json({
             paymentIntent: paymentIntent.client_secret,
-            // ephemeralKey: emphemeralKey.secret,
-            // customer: customer.id,
-            // publishableKey: "pk_test_51NUrfgD90vK9yhfdi1ynlA7pQFSVIxzrjWBbgEuGpjLjJ20RkgaKZqbcDzQ3p8oTPsmrX1VdeCfYCcVGMldQy5fw00syggW8a1"
+            ephemeralKey: ephemeralKey.secret,
+            customer: customer.id,
+            publishableKey: "pk_test_51NUrfgD90vK9yhfdi1ynlA7pQFSVIxzrjWBbgEuGpjLjJ20RkgaKZqbcDzQ3p8oTPsmrX1VdeCfYCcVGMldQy5fw00syggW8a1"
         });
     } catch (error) {
         res.status(400).json({
-            error: e.message,
+            error: error.message,
         });
     }
 });

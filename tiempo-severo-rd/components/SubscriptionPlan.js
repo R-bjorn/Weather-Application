@@ -8,11 +8,14 @@ import STRIPE from "../constants/stripe_constants";
 import { StripeProvider, usePaymentSheet } from '@stripe/stripe-react-native';  
 import { PlatformPayButton, isPlatformPaySupported } from '@stripe/stripe-react-native';
 
+const fetch = require('node-fetch');
+
 const SubscriptionPlan = (props) => {
 
   const { user } = useAuth();
   const [ready, setReady] = useState(false);
   const {initPaymentSheet, presentPaymentSheet, loading} = usePaymentSheet();
+  const planPrice = props.price.toString().replace('.','');
 
   useEffect(() => {
     initializePaymentSheet();
@@ -38,45 +41,55 @@ const SubscriptionPlan = (props) => {
   }
 
   const initializePaymentSheet = async () => {
-    const {paymentIntent, emphemeralKey, customer} = 
+    const {paymentIntent, ephemeralKey, customer} = 
       await fetchPaymentSheetParams();
 
+    
     const {error} = await initPaymentSheet({
       customerId: customer,
-      customerEphemeralKeySecret: emphemeralKey,
+      customerEphemeralKeySecret: ephemeralKey,
       paymentIntentClientSecret: paymentIntent,
       merchantDisplayName: "Tiempo Severo RD",
       allowsDelayedPaymentMethods: true,
       // returnURL: "stripe-example://stripe-redirect"
     });
     if(error){
-      alert(`Error code : ${error.code}`, error.message);
+      // alert(`Error (initializePaymentSheet) code : ${error.code}`, error.message);
+      console.log("Error Initializing Payment Sheet : ", error.message);
     }else{
       setReady(true);
+      // console.log('successfully initializing payment sheet');
     }    
   };
 
   const fetchPaymentSheetParams = async () => {
-      const response = 
-      await fetch(STRIPE.API_URL, {
+
+      const requestBody = {
+        amount: planPrice
+      };
+
+      const options = {
         method: 'POST',
         headers: {
           'Content-Type' : 'application/json',
         },
-      })
-      .catch(function(error) {
-        console.log('There has been a problem with your fetch operation: ' + error.message);
-         // ADD THIS THROW error
-          throw error;
-        }
-      );
-      const {paymentIntent, emphemeralKey, customer} = await response.json();
-
-      return {
-        paymentIntent,
-        emphemeralKey,
-        customer
+        body: JSON.stringify(requestBody),
       };
+
+      try {
+        const response = await fetch(STRIPE.API_URL, options);
+        const {paymentIntent, ephemeralKey, customer} = await response.json();
+        
+        return {
+          paymentIntent,
+          ephemeralKey,
+          customer
+        };
+      } catch (error) {
+        console.log("Error fetching payment intent",error);
+      }
+    
+      
   };
 
   async function purchasePlan() {
@@ -122,7 +135,7 @@ const SubscriptionPlan = (props) => {
             <View>
               <TouchableOpacity
                 style={[styles.purchaseBtn, {backgroundColor: (props.enable) ? "#aab5ff" : '#fff'}]}
-                onPress={() => {purchasePlan}}
+                onPress={() => {purchasePlan()}}
               >
                 <Text style={{ 
                   color: (props.enable) ? "#fff": "#000",  
