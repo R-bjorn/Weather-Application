@@ -1,5 +1,5 @@
 const express = require('express');
-const paymentRoutes = require('./paymentRoutes');
+const paymentRoutes = require('../Extra Scripts/paymentRoutes');
 const bodyParser = require('body-parser');
 
 const app = express();
