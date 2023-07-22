@@ -1,9 +1,9 @@
-let BASE_URL = 'https://api-m.sandbox.paypal.com';
+let BASE_URL = 'https://api.paypal.com';
 const base64 = require('base-64');
 const { Header } = require('react-native/Libraries/NewAppScreen');
 
-let clientID = 'AfTslJzDpOFDQ5WQpLjXcQbBjaa06dZZ_qbgng4eN8Oj2FJvg4LDdOVf4wSWTU3b7MesXz41RxocttCH';
-let clientSecretKey = 'EKb2WqbxS0naVAAAwzaYFO4SVmryaPEKljpnUNfH7aI-IDXrN82fDXS_E2n8WDEbZOP56Z_5c--WgGwr';
+let clientID = 'AYExLkDzBEnWIcSXN9H6oKxOHWhbwZq7w43nuYvjr72iyeizlc86my4ntyXBHlzp1OidALgarrISp5p3';
+let clientSecretKey = 'EPJDMt9dyjBMaD5NDDJNGAGaxz_Z0QjmLq_lPtXXyTuRT4PmC0h3NBATeFuaFRPWoJUkgtxklvV-5hi9';
 
 
 let orderDetail = {

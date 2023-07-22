@@ -182,7 +182,7 @@ const Dashboard = ({ navigation}) => {
         )}
 
         {/* All Maps Scrolable Content */}
-        <ScrollView style={styles.mapsViewContainer}
+        <ScrollView style={[styles.mapsViewContainer, {backgroundColor: '#d0d0d0'}]}
             refreshControl={
                 <RefreshControl
                   refreshing={refreshing}

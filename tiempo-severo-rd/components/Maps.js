@@ -40,10 +40,11 @@ const windowWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({    
     container: {
         height: 350,
-        backgroundColor: '#e8f9ee',
-        borderWidth: 1,
+        backgroundColor: 'white',
+        // borderWidth: 1,
+        borderRadius: 10,
         padding: 5,
-        paddingVertical: 10,
+        // paddingVertical: 10,
         marginVertical: 5,
     },
     mapContainer: {
