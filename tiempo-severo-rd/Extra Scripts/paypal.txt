@@ -1,0 +1,18 @@
+  // const product = await paypalapi.createProduct(token, props.user);
+
+      // setAccessToken(token);
+      // if(!!product?.id){ 
+      //   setProductId(product.id); 
+      //   startPlan(token, product.id);
+      // }
+  // const startPlan = async (token, productId) => {
+  //   try {
+  //     const plan  = await paypalapi.createPlan(token, productId, props.user, props.price);
+  //     if(!!plan?.id){ 
+  //       setPlanId(plan.id); 
+  //       startSubscription(token, plan.id);
+  //     }
+  //   } catch (error) {
+  //     console.log("Error starting a plan : ", error);
+  //   }
+  // }
