@@ -48,11 +48,12 @@ const SubscriptionPlan = (props) => {
       const token = await paypalapi.generateToken();
 
       const subscription = await paypalapi.createSubscription(token, plan_id);
-      console.log('Sub : ', subscription);
+      // console.log('Sub : ', subscription);
       if(!!subscription){
         setSubscriptionId(subscription?.id);
         if(subscription?.links){
           const findUrl = subscription.links.find(data => data?.rel == "approve");
+          // console.log('URL data : ', findUrl);
           setPaypalUrl(findUrl?.href);
           setIsLoading(false);  
         }                  

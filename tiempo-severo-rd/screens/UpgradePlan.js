@@ -121,9 +121,9 @@ const Dashboard = ({ navigation} ) => {
           <SubscriptionPlan 
             user="Premium User" 
             price={7.99}
-            benifit1=" "
-            benifit2=" "
-            benifit3=" "
+            benifit1="Full Access to All Features"
+            benifit2="Enhanced Weather Coverage"
+            benifit3="Event-Specific Alerts"
             enable={(role === 1) ? true : false}
             image={require("../images/premium_user.jpg")}
             userRole = {1}

@@ -42,7 +42,8 @@ const Login = ({ }) => {
 
             {/* Login Form */}
             <View style={{ flex: 1, marginHorizontal: 22, 
-                backgroundColor: COLORS.transparentWhite, top: '20%', padding: 20, maxHeight: (Platform.OS === 'ios') ? 490 : 520
+                backgroundColor: COLORS.transparentWhite, top: '25%', 
+                padding: 20, maxHeight: (Platform.OS === 'ios') ? 450 : 520
             }}>
                 {/* Welcome Text */}
                 <View style={{ }}>
@@ -127,7 +128,7 @@ const Login = ({ }) => {
                     </View>
                 </View>
                 {/* Remember Me */}
-                <View style={{
+                {/* <View style={{
                     flexDirection: 'row',
                     marginVertical: 6
                 }}>
@@ -139,7 +140,7 @@ const Login = ({ }) => {
                     />
 
                     <Text>Remember Me</Text>
-                </View>
+                </View> */}
 
                 {/* Login Button */}
                 <TouchableOpacity
