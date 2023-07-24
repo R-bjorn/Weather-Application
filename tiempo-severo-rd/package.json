@@ -32,6 +32,7 @@
     "react-native-gesture-handler": "~2.9.0",
     "react-native-image-crop-picker": "^0.40.0",
     "react-native-image-picker": "^5.6.0",
+    "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-reanimated": "~2.14.4",
     "react-native-select-dropdown": "^3.3.4",
     "react-native-vector-icons": "^9.2.0",

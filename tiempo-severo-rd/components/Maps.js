@@ -1,14 +1,19 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Dimensions } from 'react-native'
-import React from 'react'
-
+import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Dimensions, Modal } from 'react-native'
+import React, {useState} from 'react'
+import Icon from '@expo/vector-icons/FontAwesome';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const Maps = ({ image, description }) => {
+  const [isMapClicked, setMapClicked] = useState(false);
+
   return (
     <View style={[styles.container]}>
       {/* <Text>Map </Text> */}
       {/* Map Image */}
       <View style={[styles.mapContainer]}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {setMapClicked(true)}}
+        >
             <Image 
                 style={[styles.mapImage]}
                 source={{ uri: image }}
@@ -31,6 +36,31 @@ const Maps = ({ image, description }) => {
         </TouchableOpacity>
         
       </View>
+
+      {/* Map Image Modal Overview */}
+      <Modal 
+        visible={isMapClicked}
+        transparent={true}
+        onRequestClose={() => {setMapClicked(false)}}
+        animationType='fade'
+        // presentationStyle='pageSheet'
+      >
+        <SafeAreaView style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.8)'}}>
+          {/* Back Button */}
+          <TouchableOpacity 
+            style={{marginHorizontal: 15}}
+            onPress={() => {setMapClicked(false)}}  
+          >
+            <Icon name='times' size={40} style={{color:'white'}}/>
+          </TouchableOpacity>
+          {/* Pinchable Image */}
+          <ImageViewer 
+            imageUrls={[{url: image, props: {}}]}
+            backgroundColor='rgba(0,0,0,0)'
+            renderIndicator={() => null}        
+          />
+        </SafeAreaView>
+      </Modal>
     </View>
   )
 }
@@ -39,12 +69,10 @@ const windowWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({    
     container: {
-        height: 350,
+        height: 450,
         backgroundColor: 'white',
-        // borderWidth: 1,
         borderRadius: 10,
         padding: 5,
-        // paddingVertical: 10,
         marginVertical: 5,
     },
     mapContainer: {
@@ -53,19 +81,21 @@ const styles = StyleSheet.create({
         
     },
     mapImage: {
-        height: '100%',
+        height: "100%",
         width: windowWidth - 32,
         resizeMode: 'cover'
     },
     mapDescription: {
         marginBottom: 10,
         padding: 5,
+        width: windowWidth - 32
     },
     buttonContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
         paddingHorizontal: 5,
+        paddingBottom: 10
     },
     button: {
         borderWidth: 1,
