@@ -44,8 +44,15 @@ const Dashboard = ({ navigation} ) => {
      const usersCollectionRef = firebase.firestore().collection('users');
      // Query the collection and retrieve the roles of each user
      usersCollectionRef.doc(user?.uid).get()
-     .then((doc) => { setRole(doc.data().role); })
-     .catch((error) => { console.log('Error getting users:', error); });
+     .then(
+        (doc) => {
+            try {
+                setRole(doc.data().role);
+            } catch (error) {
+                // Error
+            }
+        }
+    );
  
      // Maps data variables and fetching map data
      const [mapsData, setMapsData] = useState([]);

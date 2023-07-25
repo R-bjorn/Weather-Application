@@ -13,6 +13,12 @@
     "production": {}
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "huracanescribe@gmail.com",
+        "ascAppId": "6451315204",
+        "appleTeamId": "86C7769Q7Q"
+      }
+    }
   }
 }

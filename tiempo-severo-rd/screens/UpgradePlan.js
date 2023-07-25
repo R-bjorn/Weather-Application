@@ -42,15 +42,17 @@ const Dashboard = ({ navigation} ) => {
   const usersCollectionRef = firebase.firestore().collection('users');
 
   // Query the collection and retrieve the roles of each user
-  usersCollectionRef
-  .doc(user?.uid)
-  .get()
-  .then((doc) => {
-    setRole(doc.data().role);
-  })
-  .catch((error) => {
-      console.log('Error getting users:', error);
-  });
+  usersCollectionRef.doc(user?.uid).get()
+  .then(
+    (doc) => {
+        try {
+            setRole(doc.data().role);
+        } catch (error) {
+            // Error
+        }
+    }
+  );
+  
   return (
     <>
       <SafeAreaView style={{flex:0, backgroundColor: '#4967a4'}}/>
